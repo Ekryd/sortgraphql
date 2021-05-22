@@ -1,0 +1,5 @@
+package sortgraphql;
+
+class SchemaPrinterTest {
+
+}

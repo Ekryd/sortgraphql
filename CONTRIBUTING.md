@@ -2,8 +2,8 @@
 
 Please add the following information.
   * What do you want to achieve / What is the purpose?
-  * Which version of SortPom are you using (if relevant)?
-  * What is the configuration of SortPom (if relevant)?
+  * Which version of SortGraphQL are you using (if relevant)?
+  * What is the configuration of SortGraphQL (if relevant)?
   
 ### Error issues
 
