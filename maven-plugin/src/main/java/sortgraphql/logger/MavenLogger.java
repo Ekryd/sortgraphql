@@ -1,12 +1,8 @@
-package sortpom.logger;
+package sortgraphql.logger;
 
 import org.apache.maven.plugin.logging.Log;
-import sortgraphql.logger.SortingLogger;
 
-/**
- * @author bjorn
- * @since 2012-12-22
- */
+/** Facade for the internal plugin logger. Makes it easier to test logging output and isolates the sorter module from plugin internals */
 public class MavenLogger implements SortingLogger {
     private final Log pluginLogger;
 

@@ -1,7 +1,6 @@
-package sortpom.exception;
+package sortgraphql.exception;
 
 import org.apache.maven.plugin.MojoFailureException;
-import sortgraphql.exception.FailureException;
 
 /**
  * Converts internal runtime FailureException in a method to a MojoFailureException in order to give nice output to
