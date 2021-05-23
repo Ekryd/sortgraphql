@@ -1,4 +1,4 @@
-package sortgraphql;
+package sortgraphql.sort;
 
 import graphql.Assert;
 import graphql.PublicApi;
@@ -200,7 +200,7 @@ public class SchemaPrinter {
      * This flag controls whether schema printer will include directive definitions at the top of
      * the schema, but does not remove them from the field or type usage.
      *
-     * <p>In some schema defintions, like Apollo Federation, the schema should be printed without
+     * <p>In some schema definitions, like Apollo Federation, the schema should be printed without
      * the directive definitions. This simplified schema is returned by a GraphQL query to other
      * services, in a format that is different that the introspection query.
      *
@@ -227,7 +227,7 @@ public class SchemaPrinter {
      * This flag controls whether schema printer will include non-standard directive definitions at
      * the top of the schema, but does not remove them from the field or type usage.
      *
-     * <p>In some schema defintions, like Apollo Federation, the schema should be printed without
+     * <p>In some schema definitions, like Apollo Federation, the schema should be printed without
      * the directive definitions. This simplified schema is returned by a GraphQL query to other
      * services, in a format that is different that the introspection query.
      *

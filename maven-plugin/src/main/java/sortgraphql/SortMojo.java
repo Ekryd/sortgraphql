@@ -5,7 +5,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import sortgraphql.exception.ExceptionConverter;
 import sortgraphql.logger.MavenLogger;
-import sortpom.parameter.PluginParameters;
+import sortgraphql.parameter.PluginParameters;
 
 /**
  * Sorts a GraphQL Schema definition file.
@@ -19,6 +19,7 @@ public class SortMojo extends AbstractParentMojo {
             PluginParameters pluginParameters = PluginParameters.builder()
                     .setSchemaFile(schemaFile)
                     .setFileOutput(createBackupFile, backupFileExtension)
+                    .setEncoding(encoding)
                     .build();
 
             sorter.setup(new MavenLogger(getLog()), pluginParameters);

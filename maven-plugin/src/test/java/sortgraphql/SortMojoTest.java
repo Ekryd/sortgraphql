@@ -8,7 +8,7 @@ import org.junit.jupiter.api.function.Executable;
 import refutils.ReflectionHelper;
 import sortgraphql.exception.FailureException;
 import sortgraphql.logger.SortingLogger;
-import sortpom.parameter.PluginParameters;
+import sortgraphql.parameter.PluginParameters;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
