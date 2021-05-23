@@ -38,7 +38,7 @@ public class FileUtil {
        } catch (UnsupportedCharsetException ex) {
             throw new FailureException("Could not handle encoding: " + encoding, ex);
         } catch (IOException ex) {
-            throw new FailureException("Could not read pom file: " + schemaFile.getAbsolutePath(), ex);
+            throw new FailureException("Could not read schema file: " + schemaFile.getAbsolutePath(), ex);
         }
         return content;
     }
@@ -67,7 +67,7 @@ public class FileUtil {
      * @param sortedSchema The content to save
      */
     public void saveSchema(String sortedSchema) {
-        saveFile(schemaFile, sortedSchema, "Could not save sorted pom file: " + schemaFile.getAbsolutePath());
+        saveFile(schemaFile, sortedSchema, "Could not save sorted schema file: " + schemaFile.getAbsolutePath());
     }
 
     private void saveFile(File fileToSave, String content, String errorMessage) {

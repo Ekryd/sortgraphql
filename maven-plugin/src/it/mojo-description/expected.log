@@ -1,0 +1,67 @@
+Name: SortGraphQL Plugin
+Description: A Maven plugin that sorts GraphQL Schemas
+Group Id: com.github.ekryd.sortgraphql
+Artifact Id: sortgraphql-maven-plugin
+Version: @pom.version@
+Goal Prefix: sortgraphql
+
+This plugin has 2 goals:
+
+sortgraphql:help
+  Description: Display help information on sortgraphql-maven-plugin.
+    Call mvn sortgraphql:help -Ddetail=true -Dgoal=<goal-name> to display
+    parameter details.
+  Implementation: sortgraphql.HelpMojo
+  Language: java
+
+  Available parameters:
+
+    detail (Default: false)
+      User property: detail
+      If true, display all settable properties for each goal.
+
+    goal
+      User property: goal
+      The name of the goal for which to show help. If unspecified, all goals
+      will be displayed.
+
+    indentSize (Default: 2)
+      User property: indentSize
+      The number of spaces per indentation level, should be positive.
+
+    lineLength (Default: 80)
+      User property: lineLength
+      The maximum length of a display line, should be positive.
+
+sortgraphql:sort
+  Description: Sorts a GraphQL Schema definition file.
+  Implementation: sortgraphql.SortMojo
+  Language: java
+  Bound to phase: validate
+
+  Available parameters:
+
+    backupFileExtension (Default: .bak)
+      User property: sortgraphql.backupFileExtension
+      Name of the file extension for the backup file.
+
+    createBackupFile (Default: true)
+      User property: sortgraphql.createBackupFile
+      Should a backup copy be created for the sorted schema.
+
+    encoding (Default: UTF-8)
+      User property: sortgraphql.encoding
+      Encoding for the files.
+
+    schemaFile (Default: schema.graphqls)
+      User property: sortgraphql.schemaFile
+      Location of the graphql schema file that should be sorted.
+
+    skip (Default: false)
+      User property: sortgraphql.skip
+      Set this to 'true' to bypass SortGraphQL plugin
+
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------

@@ -142,6 +142,22 @@
           <version>3.0.0-M1</version>
         </plugin>
         <plugin>
+          <!-- Used for Maven integration testing -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-invoker-plugin</artifactId>
+          <version>3.2.2</version>
+          <configuration>
+            <!-- for jacoco to analyze integration test runs, the jar-file has to be in the local repository used by the invoker plugin when running tests -->
+            <extraArtifacts>
+              <extraArtifact>org.jacoco:org.jacoco.agent:0.8.5:jar:runtime</extraArtifact>
+            </extraArtifacts>
+            <!-- skip any .mavenrc file to override what the jacoco agent defined in the invoker.mavenOpts variable -->
+            <environmentVariables>
+              <MAVEN_SKIP_RC>1</MAVEN_SKIP_RC>
+            </environmentVariables>
+          </configuration>
+        </plugin>
+        <plugin>
           <!-- Define versions for standard plugins -->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
