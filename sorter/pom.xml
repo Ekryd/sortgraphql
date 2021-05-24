@@ -20,7 +20,7 @@
     <dependency>
       <groupId>com.graphql-java</groupId>
       <artifactId>graphql-java</artifactId>
-      <version>16.2</version>
+      <version>2021-05-03T08-53-12-8f1ec444</version>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>

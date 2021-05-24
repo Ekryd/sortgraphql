@@ -1,0 +1,22 @@
+scalar _Any
+# used to represent a set of fields (minus the braces around them).
+scalar _FieldSet
+
+directive @key(fields: _FieldSet!) repeatable on OBJECT | INTERFACE
+
+type Query {
+    me :Me
+}
+
+
+type Me @key(fields: "id"){
+    id: ID
+    name: String
+}
+
+directive @external on FIELD_DEFINITION
+directive @requires(fields: _FieldSet!) on FIELD_DEFINITION
+directive @provides(fields: _FieldSet!) on FIELD_DEFINITION
+
+# this is an optional directive
+directive @extends on OBJECT | INTERFACE

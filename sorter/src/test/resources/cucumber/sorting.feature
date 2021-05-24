@@ -139,11 +139,11 @@ union Thing = Car | Product
 """
 directive @composedGraph(version: Int!) on SCHEMA
 directive @graph(name: String!, url: String!) repeatable on SCHEMA
-directive @owner(graph: String!) on OBJECT
 directive @key(fields: String!, graph: String!) repeatable on OBJECT
-directive @resolve(graph: String!) on FIELD_DEFINITION
+directive @owner(graph: String!) on OBJECT
 directive @provides(fields: String!) on FIELD_DEFINITION
 directive @requires(fields: String!) on FIELD_DEFINITION
+directive @resolve(graph: String!) on FIELD_DEFINITION
 directive @stream on FIELD
 directive @transform(from: String!) on FIELD
 

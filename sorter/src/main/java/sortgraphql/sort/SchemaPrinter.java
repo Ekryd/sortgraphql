@@ -5,9 +5,6 @@ import graphql.PublicApi;
 import graphql.language.*;
 import graphql.schema.*;
 import graphql.schema.idl.ScalarInfo;
-import graphql.schema.idl.SchemaParser;
-import graphql.schema.idl.TypeDefinitionRegistry;
-import graphql.schema.idl.UnExecutableSchemaGenerator;
 import graphql.schema.visibility.GraphqlFieldVisibility;
 
 import java.io.PrintWriter;
@@ -20,7 +17,6 @@ import java.util.stream.Stream;
 
 import static graphql.Directives.DeprecatedDirective;
 import static graphql.introspection.Introspection.DirectiveLocation.*;
-import static graphql.schema.visibility.DefaultGraphqlFieldVisibility.DEFAULT_FIELD_VISIBILITY;
 import static graphql.util.EscapeUtil.escapeJsonString;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.*;
@@ -38,358 +34,9 @@ public class SchemaPrinter {
           .validLocations(FIELD_DEFINITION, ENUM_VALUE, ARGUMENT_DEFINITION, INPUT_FIELD_DEFINITION)
           .build();
 
-  /** Options to use when printing a schema */
-  public static class Options {
-
-    private final boolean includeIntrospectionTypes;
-
-    private final boolean includeScalars;
-
-    private final boolean useAstDefinitions;
-
-    private final boolean includeSchemaDefinition;
-
-    private final boolean includeDirectiveDefinitions;
-    private final boolean includeDefinedDirectiveDefinitions;
-
-    private final boolean descriptionsAsHashComments;
-
-    private final Predicate<GraphQLDirective> includeDirective;
-
-    private final Predicate<GraphQLSchemaElement> includeSchemaElement;
-
-    private final GraphqlTypeComparatorRegistry comparatorRegistry;
-
-    private Options(
-        boolean includeIntrospectionTypes,
-        boolean includeScalars,
-        boolean includeSchemaDefinition,
-        boolean includeDirectiveDefinitions,
-        boolean includeDefinedDirectiveDefinitions,
-        boolean useAstDefinitions,
-        boolean descriptionsAsHashComments,
-        Predicate<GraphQLDirective> includeDirective,
-        Predicate<GraphQLSchemaElement> includeSchemaElement,
-        GraphqlTypeComparatorRegistry comparatorRegistry) {
-      this.includeIntrospectionTypes = includeIntrospectionTypes;
-      this.includeScalars = includeScalars;
-      this.includeSchemaDefinition = includeSchemaDefinition;
-      this.includeDirectiveDefinitions = includeDirectiveDefinitions;
-      this.includeDefinedDirectiveDefinitions = includeDefinedDirectiveDefinitions;
-      this.includeDirective = includeDirective;
-      this.useAstDefinitions = useAstDefinitions;
-      this.descriptionsAsHashComments = descriptionsAsHashComments;
-      this.comparatorRegistry = comparatorRegistry;
-      this.includeSchemaElement = includeSchemaElement;
-    }
-
-    public boolean isIncludeIntrospectionTypes() {
-      return includeIntrospectionTypes;
-    }
-
-    public boolean isIncludeScalars() {
-      return includeScalars;
-    }
-
-    public boolean isIncludeSchemaDefinition() {
-      return includeSchemaDefinition;
-    }
-
-    public boolean isIncludeDirectiveDefinitions() {
-      return includeDirectiveDefinitions;
-    }
-
-    public Predicate<GraphQLDirective> getIncludeDirective() {
-      return includeDirective;
-    }
-
-    public Predicate<GraphQLSchemaElement> getIncludeSchemaElement() {
-      return includeSchemaElement;
-    }
-
-    public boolean isDescriptionsAsHashComments() {
-      return descriptionsAsHashComments;
-    }
-
-    public GraphqlTypeComparatorRegistry getComparatorRegistry() {
-      return comparatorRegistry;
-    }
-
-    public boolean isUseAstDefinitions() {
-      return useAstDefinitions;
-    }
-
-    public static Options defaultOptions() {
-      return new Options(
-          false,
-          true,
-          false,
-          true,
-          false,
-          false,
-          false,
-          directive -> true,
-          element -> true,
-          DefaultGraphqlTypeComparatorRegistry.defaultComparators());
-    }
-
-    /**
-     * This will allow you to include introspection types that are contained in a schema
-     *
-     * @param flag whether to include them
-     * @return options
-     */
-    public Options includeIntrospectionTypes(boolean flag) {
-      return new Options(
-          flag,
-          this.includeScalars,
-          this.includeSchemaDefinition,
-          this.includeDirectiveDefinitions,
-          this.includeDefinedDirectiveDefinitions,
-          this.useAstDefinitions,
-          this.descriptionsAsHashComments,
-          this.includeDirective,
-          this.includeSchemaElement,
-          this.comparatorRegistry);
-    }
-
-    /**
-     * This will allow you to include scalar types that are contained in a schema
-     *
-     * @param flag whether to include them
-     * @return options
-     */
-    public Options includeScalarTypes(boolean flag) {
-      return new Options(
-          this.includeIntrospectionTypes,
-          flag,
-          this.includeSchemaDefinition,
-          this.includeDirectiveDefinitions,
-          this.includeDefinedDirectiveDefinitions,
-          this.useAstDefinitions,
-          this.descriptionsAsHashComments,
-          this.includeDirective,
-          this.includeSchemaElement,
-          this.comparatorRegistry);
-    }
-
-    /**
-     * This will force the printing of the graphql schema definition even if the query, mutation,
-     * and/or subscription types use the default names. Some graphql parsers require this
-     * information even if the schema uses the default type names. The schema definition will always
-     * be printed if any of the query, mutation, or subscription types do not use the default names.
-     *
-     * @param flag whether to force include the schema definition
-     * @return options
-     */
-    public Options includeSchemaDefinition(boolean flag) {
-      return new Options(
-          this.includeIntrospectionTypes,
-          this.includeScalars,
-          flag,
-          this.includeDirectiveDefinitions,
-          this.includeDefinedDirectiveDefinitions,
-          this.useAstDefinitions,
-          this.descriptionsAsHashComments,
-          this.includeDirective,
-          this.includeSchemaElement,
-          this.comparatorRegistry);
-    }
-
-    /**
-     * This flag controls whether schema printer will include directive definitions at the top of
-     * the schema, but does not remove them from the field or type usage.
-     *
-     * <p>In some schema definitions, like Apollo Federation, the schema should be printed without
-     * the directive definitions. This simplified schema is returned by a GraphQL query to other
-     * services, in a format that is different that the introspection query.
-     *
-     * <p>On by default.
-     *
-     * @param flag whether to print directive definitions
-     * @return new instance of options
-     */
-    public Options includeDirectiveDefinitions(boolean flag) {
-      return new Options(
-          this.includeIntrospectionTypes,
-          this.includeScalars,
-          this.includeSchemaDefinition,
-          flag,
-          this.includeDefinedDirectiveDefinitions,
-          this.useAstDefinitions,
-          this.descriptionsAsHashComments,
-          this.includeDirective,
-          this.includeSchemaElement,
-          this.comparatorRegistry);
-    }
-
-    /**
-     * This flag controls whether schema printer will include non-standard directive definitions at
-     * the top of the schema, but does not remove them from the field or type usage.
-     *
-     * <p>In some schema definitions, like Apollo Federation, the schema should be printed without
-     * the directive definitions. This simplified schema is returned by a GraphQL query to other
-     * services, in a format that is different that the introspection query.
-     *
-     * <p>On by default.
-     *
-     * @param flag whether to print directive definitions
-     * @return new instance of options
-     */
-    public Options includeDefinedDirectiveDefinitions(boolean flag) {
-      return new Options(
-          this.includeIntrospectionTypes,
-          this.includeScalars,
-          this.includeSchemaDefinition,
-          this.includeDirectiveDefinitions,
-          flag,
-          this.useAstDefinitions,
-          this.descriptionsAsHashComments,
-          this.includeDirective,
-          this.includeSchemaElement,
-          this.comparatorRegistry);
-    }
-
-    /**
-     * Allow to print directives. In some situations, auto-generated schemas contain a lot of
-     * directives that make the printout noisy and having this flag would allow cleaner printout. On
-     * by default.
-     *
-     * @param flag whether to print directives
-     * @return new instance of options
-     */
-    public Options includeDirectives(boolean flag) {
-      return new Options(
-          this.includeIntrospectionTypes,
-          this.includeScalars,
-          this.includeSchemaDefinition,
-          this.includeDirectiveDefinitions,
-          this.includeDefinedDirectiveDefinitions,
-          this.useAstDefinitions,
-          this.descriptionsAsHashComments,
-          directive -> flag,
-          this.includeSchemaElement,
-          this.comparatorRegistry);
-    }
-
-    /**
-     * This is a Predicate that decides whether a directive element is printed.
-     *
-     * @param includeDirective the predicate to decide of a directive is printed
-     * @return new instance of options
-     */
-    public Options includeDirectives(Predicate<GraphQLDirective> includeDirective) {
-      return new Options(
-          this.includeIntrospectionTypes,
-          this.includeScalars,
-          this.includeSchemaDefinition,
-          this.includeDirectiveDefinitions,
-          this.includeDefinedDirectiveDefinitions,
-          this.useAstDefinitions,
-          this.descriptionsAsHashComments,
-          includeDirective,
-          this.includeSchemaElement,
-          this.comparatorRegistry);
-    }
-
-    /**
-     * This is a general purpose Predicate that decides whether a schema element is printed ever.
-     *
-     * @param includeSchemaElement the predicate to decide of a schema is printed
-     * @return new instance of options
-     */
-    public Options includeSchemaElement(Predicate<GraphQLSchemaElement> includeSchemaElement) {
-      Assert.assertNotNull(includeSchemaElement);
-      return new Options(
-          this.includeIntrospectionTypes,
-          this.includeScalars,
-          this.includeSchemaDefinition,
-          this.includeDirectiveDefinitions,
-          this.includeDefinedDirectiveDefinitions,
-          this.useAstDefinitions,
-          this.descriptionsAsHashComments,
-          includeDirective,
-          includeSchemaElement,
-          this.comparatorRegistry);
-    }
-
-    /**
-     * This flag controls whether schema printer will use the {@link graphql.schema.GraphQLType}'s
-     * original Ast {@link graphql.language.TypeDefinition}s when printing the type. This allows
-     * access to any `extend type` declarations that might have been originally made.
-     *
-     * @param flag whether to print via AST type definitions
-     * @return new instance of options
-     */
-    public Options useAstDefinitions(boolean flag) {
-      return new Options(
-          this.includeIntrospectionTypes,
-          this.includeScalars,
-          this.includeSchemaDefinition,
-          this.includeDirectiveDefinitions,
-          this.includeDefinedDirectiveDefinitions,
-          flag,
-          this.descriptionsAsHashComments,
-          this.includeDirective,
-          this.includeSchemaElement,
-          this.comparatorRegistry);
-    }
-
-    /**
-     * Descriptions are defined as preceding string literals, however an older legacy versions of
-     * SDL supported preceding '#' comments as descriptions. Set this to true to enable this
-     * deprecated behavior. This option is provided to ease adoption and may be removed in future
-     * versions.
-     *
-     * @param flag whether to print description as # comments
-     * @return new instance of options
-     */
-    public Options descriptionsAsHashComments(boolean flag) {
-      return new Options(
-          this.includeIntrospectionTypes,
-          this.includeScalars,
-          this.includeSchemaDefinition,
-          this.includeDirectiveDefinitions,
-          this.includeDefinedDirectiveDefinitions,
-          this.useAstDefinitions,
-          flag,
-          this.includeDirective,
-          this.includeSchemaElement,
-          this.comparatorRegistry);
-    }
-
-    /**
-     * The comparator registry controls the printing order for registered {@code GraphQLType}s.
-     *
-     * <p>The default is to sort elements by name but you can put in your own code to decide on the
-     * field order
-     *
-     * @param comparatorRegistry The registry containing the {@code Comparator} and environment
-     *     scoping rules.
-     * @return options
-     */
-    public Options setComparators(GraphqlTypeComparatorRegistry comparatorRegistry) {
-      return new Options(
-          this.includeIntrospectionTypes,
-          this.includeScalars,
-          this.includeSchemaDefinition,
-          this.includeDirectiveDefinitions,
-          this.includeDefinedDirectiveDefinitions,
-          this.useAstDefinitions,
-          this.descriptionsAsHashComments,
-          this.includeDirective,
-          this.includeSchemaElement,
-          comparatorRegistry);
-    }
-  }
-
   private final Map<Class<?>, TypePrinter<?>> printers = new LinkedHashMap<>();
 
   private final Options options;
-
-  public SchemaPrinter() {
-    this(Options.defaultOptions());
-  }
 
   public SchemaPrinter(Options options) {
     this.options = options;
@@ -400,21 +47,6 @@ public class SchemaPrinter {
     printers.put(GraphQLInterfaceType.class, interfacePrinter());
     printers.put(GraphQLUnionType.class, unionPrinter());
     printers.put(GraphQLInputObjectType.class, inputObjectPrinter());
-  }
-
-  /**
-   * This can print an in memory GraphQL IDL document back to a logical schema definition. If you
-   * want to turn a Introspection query result into a Document (and then into a printed schema) then
-   * use {@link
-   * graphql.introspection.IntrospectionResultToSchema#createSchemaDefinition(java.util.Map)} first
-   * to get the {@link graphql.language.Document} and then print that.
-   *
-   * @param schemaIDL the parsed schema IDL
-   * @return the logical schema definition
-   */
-  public String print(Document schemaIDL) {
-    TypeDefinitionRegistry registry = new SchemaParser().buildRegistry(schemaIDL);
-    return print(UnExecutableSchemaGenerator.makeUnExecutableSchema(registry));
   }
 
   /**
@@ -429,7 +61,7 @@ public class SchemaPrinter {
 
     GraphqlFieldVisibility visibility = schema.getCodeRegistry().getFieldVisibility();
 
-    printer(schema.getClass()).print(out, schema, visibility);
+    schemaPrinter().print(out, schema, visibility);
 
     List<GraphQLNamedType> typesAsList =
         schema.getAllTypesAsList().stream()
@@ -498,19 +130,6 @@ public class SchemaPrinter {
     return returnValue;
   }
 
-  private void printType(
-      PrintWriter out,
-      ArrayList<GraphQLNamedType> typesAsList,
-      String name,
-      GraphqlFieldVisibility visibility) {
-    for (GraphQLNamedType graphQLNamedType : typesAsList) {
-      if (graphQLNamedType.getName().equals(name)) {
-        printType(out, graphQLNamedType, visibility);
-        break;
-      }
-    }
-  }
-
   private interface TypePrinter<T> {
 
     void print(PrintWriter out, T type, GraphqlFieldVisibility visibility);
@@ -560,7 +179,7 @@ public class SchemaPrinter {
               .elementType(GraphQLEnumValueDefinition.class)
               .build();
       Comparator<? super GraphQLSchemaElement> comparator =
-          options.comparatorRegistry.getComparator(environment);
+          options.getComparatorRegistry().getComparator(environment);
 
       if (shouldPrintAsAst(type.getDefinition())) {
         printAsAst(out, type.getDefinition(), type.getExtensionDefinitions());
@@ -646,7 +265,7 @@ public class SchemaPrinter {
                   .elementType(GraphQLOutputType.class)
                   .build();
           Comparator<? super GraphQLSchemaElement> implementsComparator =
-              options.comparatorRegistry.getComparator(environment);
+              options.getComparatorRegistry().getComparator(environment);
 
           Stream<String> interfaceNames =
               type.getInterfaces().stream()
@@ -667,7 +286,7 @@ public class SchemaPrinter {
                 .elementType(GraphQLFieldDefinition.class)
                 .build();
         Comparator<? super GraphQLSchemaElement> comparator =
-            options.comparatorRegistry.getComparator(environment);
+            options.getComparatorRegistry().getComparator(environment);
 
         printFieldDefinitions(out, comparator, visibility.getFieldDefinitions(type));
         out.format("\n\n");
@@ -687,7 +306,7 @@ public class SchemaPrinter {
               .elementType(GraphQLOutputType.class)
               .build();
       Comparator<? super GraphQLSchemaElement> comparator =
-          options.comparatorRegistry.getComparator(environment);
+          options.getComparatorRegistry().getComparator(environment);
 
       if (shouldPrintAsAst(type.getDefinition())) {
         printAsAst(out, type.getDefinition(), type.getExtensionDefinitions());
@@ -734,7 +353,7 @@ public class SchemaPrinter {
                   .elementType(GraphQLOutputType.class)
                   .build();
           Comparator<? super GraphQLSchemaElement> implementsComparator =
-              options.comparatorRegistry.getComparator(environment);
+              options.getComparatorRegistry().getComparator(environment);
 
           Stream<String> interfaceNames =
               type.getInterfaces().stream()
@@ -755,7 +374,7 @@ public class SchemaPrinter {
                 .elementType(GraphQLFieldDefinition.class)
                 .build();
         Comparator<? super GraphQLSchemaElement> comparator =
-            options.comparatorRegistry.getComparator(environment);
+            options.getComparatorRegistry().getComparator(environment);
 
         printFieldDefinitions(out, comparator, visibility.getFieldDefinitions(type));
         out.format("\n\n");
@@ -778,7 +397,7 @@ public class SchemaPrinter {
                 .elementType(GraphQLInputObjectField.class)
                 .build();
         Comparator<? super GraphQLSchemaElement> comparator =
-            options.comparatorRegistry.getComparator(environment);
+            options.getComparatorRegistry().getComparator(environment);
 
         out.format(
             "input %s%s",
@@ -838,12 +457,17 @@ public class SchemaPrinter {
   }
 
   private static String printAst(Object value, GraphQLInputType type) {
-    return AstPrinter.printAst(AstValueHelper.astFromValue(value, type));
+    var node = value instanceof Value ? (Value<?>) value : AstValueHelper.astFromValue(value, type);
+    return AstPrinter.printAst(node);
   }
 
   private TypePrinter<GraphQLSchema> schemaPrinter() {
     return (out, schema, visibility) -> {
-      List<GraphQLDirective> schemaDirectives = schema.getSchemaDirectives();
+      List<GraphQLDirective> schemaDirectives =
+          schema.getSchemaDirectives().stream()
+              .sorted(Comparator.comparing(GraphQLDirective::getName))
+              .collect(toList());
+
       GraphQLObjectType queryType = schema.getQueryType();
       GraphQLObjectType mutationType = schema.getMutationType();
       GraphQLObjectType subscriptionType = schema.getSubscriptionType();
@@ -883,7 +507,7 @@ public class SchemaPrinter {
         if (!directives.isEmpty()) {
           out.format("%s", directiveDefinitions(directives));
         }
-      } else if (options.includeDefinedDirectiveDefinitions) {
+      } else if (options.isIncludeDefinedDirectiveDefinitions()) {
         List<GraphQLDirective> directives =
             getSchemaDirectives(schema).stream()
                 .filter(
@@ -902,15 +526,12 @@ public class SchemaPrinter {
     return schema.getDirectives().stream()
         .filter(options.getIncludeDirective())
         .filter(options.getIncludeSchemaElement())
+        .sorted(Comparator.comparing(GraphQLDirective::getName))
         .collect(toList());
   }
 
   String typeString(GraphQLType rawType) {
     return GraphQLTypeUtil.simplePrint(rawType);
-  }
-
-  String argsString(List<GraphQLArgument> arguments) {
-    return argsString(null, arguments);
   }
 
   String argsString(Class<? extends GraphQLSchemaElement> parent, List<GraphQLArgument> arguments) {
@@ -926,7 +547,7 @@ public class SchemaPrinter {
             .elementType(GraphQLArgument.class)
             .build();
     Comparator<? super GraphQLSchemaElement> comparator =
-        options.comparatorRegistry.getComparator(environment);
+        options.getComparatorRegistry().getComparator(environment);
 
     arguments =
         arguments.stream()
@@ -999,7 +620,7 @@ public class SchemaPrinter {
             .elementType(GraphQLDirective.class)
             .build();
     Comparator<? super GraphQLSchemaElement> comparator =
-        options.comparatorRegistry.getComparator(environment);
+        options.getComparatorRegistry().getComparator(environment);
 
     directives = directives.stream().sorted(comparator).collect(toList());
     for (int i = 0; i < directives.size(); i++) {
@@ -1034,7 +655,7 @@ public class SchemaPrinter {
             .elementType(GraphQLArgument.class)
             .build();
     Comparator<? super GraphQLSchemaElement> comparator =
-        options.comparatorRegistry.getComparator(environment);
+        options.getComparatorRegistry().getComparator(environment);
 
     List<GraphQLArgument> args = directive.getArguments();
     args =
@@ -1113,7 +734,7 @@ public class SchemaPrinter {
             .elementType(GraphQLArgument.class)
             .build();
     Comparator<? super GraphQLSchemaElement> comparator =
-        options.comparatorRegistry.getComparator(environment);
+        options.getComparatorRegistry().getComparator(environment);
 
     List<GraphQLArgument> args = directive.getArguments();
     args =
@@ -1150,15 +771,6 @@ public class SchemaPrinter {
       printers.put(clazz, typePrinter);
     }
     return (TypePrinter<T>) typePrinter;
-  }
-
-  public String print(GraphQLType type) {
-    StringWriter sw = new StringWriter();
-    PrintWriter out = new PrintWriter(sw);
-
-    printType(out, type, DEFAULT_FIELD_VISIBILITY);
-
-    return sw.toString();
   }
 
   private void printType(PrintWriter out, GraphQLType type, GraphqlFieldVisibility visibility) {
