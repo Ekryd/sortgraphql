@@ -1,5 +1,5 @@
 Feature: Sorting GraphQL Schemas
-  
+
   Scenario: basic query schema
     Given schema content
 """
