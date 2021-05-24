@@ -9,15 +9,16 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-help-plugin</artifactId>
-        <version>2.2</version>
-        <configuration>
-          <groupId>com.github.ekryd.sortgraphql</groupId>
-          <artifactId>sortgraphql-maven-plugin</artifactId>
-          <version>@pom.version@</version>
-          <detail>true</detail>
-        </configuration>
+        <groupId>com.github.ekryd.sortgraphql</groupId>
+        <artifactId>sortgraphql-maven-plugin</artifactId>
+        <version>@pom.version@</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>sort</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
