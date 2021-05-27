@@ -33,20 +33,18 @@ public class SchemaPrinter {
           .name("deprecated")
           .validLocations(FIELD_DEFINITION, ENUM_VALUE, ARGUMENT_DEFINITION, INPUT_FIELD_DEFINITION)
           .build();
-
-  private final Map<Class<?>, TypePrinter<?>> printers = new LinkedHashMap<>();
-
+  
   private final Options options;
+  private final TypePrinter<GraphQLSchema> schemaPrinter = schemaPrinter();
+  private final TypePrinter<GraphQLObjectType> objectPrinter = objectPrinter();
+  private final TypePrinter<GraphQLEnumType> enumPrinter = enumPrinter();
+  private final TypePrinter<GraphQLScalarType> scalarPrinter = scalarPrinter();
+  private final TypePrinter<GraphQLInterfaceType> interfacePrinter = interfacePrinter();
+  private final TypePrinter<GraphQLUnionType> unionPrinter = unionPrinter();
+  private final TypePrinter<GraphQLInputObjectType> inputObjectPrinter = inputObjectPrinter();
 
   public SchemaPrinter(Options options) {
     this.options = options;
-    printers.put(GraphQLSchema.class, schemaPrinter());
-    printers.put(GraphQLObjectType.class, objectPrinter());
-    printers.put(GraphQLEnumType.class, enumPrinter());
-    printers.put(GraphQLScalarType.class, scalarPrinter());
-    printers.put(GraphQLInterfaceType.class, interfacePrinter());
-    printers.put(GraphQLUnionType.class, unionPrinter());
-    printers.put(GraphQLInputObjectType.class, inputObjectPrinter());
   }
 
   /**
@@ -61,7 +59,7 @@ public class SchemaPrinter {
 
     GraphqlFieldVisibility visibility = schema.getCodeRegistry().getFieldVisibility();
 
-    schemaPrinter().print(out, schema, visibility);
+    schemaPrinter.print(out, schema, visibility);
 
     List<GraphQLNamedType> typesAsList =
         schema.getAllTypesAsList().stream()
@@ -69,30 +67,49 @@ public class SchemaPrinter {
             .collect(toCollection(ArrayList::new));
 
     typesAsList =
-        removeMatchingItems(typesAsList, matchesName("Query"), printType(out, visibility));
+        removeMatchingItems(
+            typesAsList,
+            matchesName("Query"),
+            type -> objectPrinter.print(out, (GraphQLObjectType) type, visibility));
     typesAsList =
-        removeMatchingItems(typesAsList, matchesName("Mutation"), printType(out, visibility));
+        removeMatchingItems(
+            typesAsList,
+            matchesName("Mutation"),
+            type -> objectPrinter.print(out, (GraphQLObjectType) type, visibility));
     typesAsList =
-        removeMatchingItems(typesAsList, matchesName("Subscription"), printType(out, visibility));
+        removeMatchingItems(
+            typesAsList,
+            matchesName("Subscription"),
+            type -> objectPrinter.print(out, (GraphQLObjectType) type, visibility));
 
     typesAsList =
         removeMatchingItems(
-            typesAsList, matchesClass(GraphQLScalarType.class), printType(out, visibility));
+            typesAsList,
+            matchesClass(GraphQLScalarType.class),
+            type -> scalarPrinter.print(out, (GraphQLScalarType) type, visibility));
     typesAsList =
         removeMatchingItems(
-            typesAsList, matchesClass(GraphQLInterfaceType.class), printType(out, visibility));
+            typesAsList,
+            matchesClass(GraphQLInterfaceType.class),
+            type -> interfacePrinter.print(out, (GraphQLInterfaceType) type, visibility));
     typesAsList =
         removeMatchingItems(
-            typesAsList, matchesClass(GraphQLUnionType.class), printType(out, visibility));
+            typesAsList,
+            matchesClass(GraphQLUnionType.class),
+            type -> unionPrinter.print(out, (GraphQLUnionType) type, visibility));
     typesAsList =
         removeMatchingItems(
-            typesAsList, matchesClass(GraphQLInputObjectType.class), printType(out, visibility));
+            typesAsList,
+            matchesClass(GraphQLInputObjectType.class),
+            type -> inputObjectPrinter.print(out, (GraphQLInputObjectType) type, visibility));
     typesAsList =
         removeMatchingItems(
-            typesAsList, matchesClass(GraphQLObjectType.class), printType(out, visibility));
+            typesAsList,
+            matchesClass(GraphQLObjectType.class),
+            type -> objectPrinter.print(out, (GraphQLObjectType) type, visibility));
     typesAsList.stream()
         .filter(matchesClass(GraphQLEnumType.class))
-        .forEach(printType(out, visibility));
+        .forEach(type -> enumPrinter.print(out, (GraphQLEnumType) type, visibility));
 
     String result = sw.toString();
     if (result.endsWith("\n\n")) {
@@ -108,10 +125,6 @@ public class SchemaPrinter {
 
   private Predicate<GraphQLNamedType> matchesName(String query) {
     return type -> type.getName().equals(query) && options.getIncludeSchemaElement().test(type);
-  }
-
-  private Consumer<GraphQLNamedType> printType(PrintWriter out, GraphqlFieldVisibility visibility) {
-    return type -> printType(out, type, visibility);
   }
 
   private <T> List<T> removeMatchingItems(
@@ -756,26 +769,6 @@ public class SchemaPrinter {
     sb.append(locations);
 
     return sb.toString();
-  }
-
-  @SuppressWarnings("unchecked")
-  private <T> TypePrinter<T> printer(Class<?> clazz) {
-    TypePrinter<?> typePrinter = printers.get(clazz);
-    if (typePrinter == null) {
-      Class<?> superClazz = clazz.getSuperclass();
-      if (superClazz != Object.class) {
-        typePrinter = printer(superClazz);
-      } else {
-        typePrinter = (out, type, visibility) -> out.println("Type not implemented : " + type);
-      }
-      printers.put(clazz, typePrinter);
-    }
-    return (TypePrinter<T>) typePrinter;
-  }
-
-  private void printType(PrintWriter out, GraphQLType type, GraphqlFieldVisibility visibility) {
-    TypePrinter<Object> printer = printer(type.getClass());
-    printer.print(out, type, visibility);
   }
 
   private String printComments(Object graphQLType, String prefix) {

@@ -22,4 +22,5 @@ type Query {
   thing3: String @something(name: "Jessie")
   thing4: String @something
 }
+
 """
