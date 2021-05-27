@@ -53,7 +53,7 @@ sortgraphql:sort
       User property: sortgraphql.encoding
       Encoding for the files.
 
-    schemaFile (Default: schema.graphqls)
+    schemaFile (Default: src/main/resources/schema.graphqls)
       User property: sortgraphql.schemaFile
       Location of the graphql schema file that should be sorted.
 

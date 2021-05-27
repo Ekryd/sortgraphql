@@ -1,7 +1,7 @@
 log = new File(basedir, 'build.log')
-sorted = new File(basedir, 'basic_products.graphqls')
+sorted = new File(basedir, 'src/main/resources/schema.graphqls')
 expected = new File(basedir, 'expected.graphqls')
-backup = new File(basedir, 'basic_products.graphqls.bak')
+backup = new File(basedir, 'src/main/resources/schema.graphqls.bak')
 
 assert log.exists()
 assert log.text.contains('Sorting file ' + sorted.absolutePath)

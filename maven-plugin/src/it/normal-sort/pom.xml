@@ -12,9 +12,6 @@
         <groupId>com.github.ekryd.sortgraphql</groupId>
         <artifactId>sortgraphql-maven-plugin</artifactId>
         <version>@pom.version@</version>
-        <configuration>
-          <schemaFile>basic_products.graphqls</schemaFile>
-        </configuration>
         <executions>
           <execution>
             <goals>

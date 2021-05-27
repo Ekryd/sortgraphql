@@ -14,7 +14,7 @@ abstract class AbstractParentMojo extends AbstractMojo {
     /**
      * Location of the graphql schema file that should be sorted.
      */
-    @Parameter(property = "sortgraphql.schemaFile", defaultValue = "schema.graphqls")
+    @Parameter(property = "sortgraphql.schemaFile", defaultValue = "src/main/resources/schema.graphqls")
     protected File schemaFile;
     
     /**
