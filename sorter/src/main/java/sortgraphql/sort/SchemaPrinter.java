@@ -660,7 +660,7 @@ public class SchemaPrinter {
     List<GraphQLArgument> args = directive.getArguments();
     args =
         args.stream()
-            .filter(arg -> arg.getValue() != null || arg.getDefaultValue() != null)
+            .filter(arg -> arg.getValue() != null && !arg.getValue().equals(arg.getDefaultValue()))
             .sorted(comparator)
             .collect(toList());
     if (!args.isEmpty()) {
