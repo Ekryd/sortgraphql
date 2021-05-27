@@ -1,25 +1,25 @@
 package sortgraphql;
 
-import graphql.language.Comment;
-import graphql.language.ScalarTypeDefinition;
-import graphql.schema.Coercing;
-import graphql.schema.GraphQLScalarType;
-import graphql.schema.idl.*;
+import graphql.language.InputValueDefinition;
+import graphql.schema.idl.RuntimeWiring;
+import graphql.schema.idl.SchemaGenerator;
+import graphql.schema.idl.SchemaParser;
 import sortgraphql.exception.FailureException;
 import sortgraphql.logger.SortingLogger;
 import sortgraphql.parameter.PluginParameters;
+import sortgraphql.sort.FakeRuntimeWiringFactory;
 import sortgraphql.sort.OptionsBuilder;
 import sortgraphql.sort.SchemaPrinter;
 import sortgraphql.util.FileUtil;
 
 import java.io.File;
-import java.util.Map;
-import java.util.function.Consumer;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /** Contain the concrete methods to sort the schema */
 public class SorterService {
   private final FileUtil fileUtil = new FileUtil();
+  private final FakeRuntimeWiringFactory wiringFactory = new FakeRuntimeWiringFactory();
 
   private SortingLogger log;
 
@@ -42,7 +42,22 @@ public class SorterService {
 
   public String sortSchema(String schema) {
     var registry = new SchemaParser().parse(schema);
-    RuntimeWiring runtimeWiring = createFakeRuntime(registry);
+    var something = registry.getDirectiveDefinition("something").orElseThrow();
+    registry.remove(something);
+    var trans = something.transform(builder -> {
+      List<InputValueDefinition> inputValueDefinitions = something.getInputValueDefinitions();
+      List<InputValueDefinition> withoutDefaultValues = inputValueDefinitions.stream()
+              .map(inputValueDefinition -> {
+                return inputValueDefinition.transform(builder1 -> {
+                  builder1.defaultValue(null);
+                });
+              })
+              .collect(Collectors.toList());
+
+      builder.inputValueDefinitions(withoutDefaultValues);
+    });
+    registry.add(trans);
+    RuntimeWiring runtimeWiring = wiringFactory.createFakeRuntime(registry);
 
     var graphQLSchema = new SchemaGenerator().makeExecutableSchema(registry, runtimeWiring);
 
@@ -55,59 +70,7 @@ public class SorterService {
 
     return new SchemaPrinter(options).print(graphQLSchema);
   }
-
-  private RuntimeWiring createFakeRuntime(TypeDefinitionRegistry registry) {
-    var coercing =
-        new Coercing<>() {
-          @Override
-          public Object serialize(Object dataFetcherResult) {
-            return dataFetcherResult;
-          }
-
-          @Override
-          public Object parseValue(Object input) {
-            return input;
-          }
-
-          @Override
-          public Object parseLiteral(Object input) {
-            return input;
-          }
-        };
-
-    return EchoingWiringFactory.newEchoingWiring(
-        new Consumer<>() {
-          @Override
-          public void accept(RuntimeWiring.Builder wiring) {
-            Map<String, ScalarTypeDefinition> scalars = registry.scalars();
-            scalars.forEach(
-                (name, v) -> {
-                  if (!ScalarInfo.isGraphqlSpecifiedScalar(name)) {
-                    wiring.scalar(
-                        GraphQLScalarType.newScalar()
-                            .name(name)
-                            .description(getDescription(v))
-                            .coercing(coercing)
-                            .build());
-                  }
-                });
-          }
-
-          private String getDescription(ScalarTypeDefinition definition) {
-            if (definition.getDescription() != null
-                && definition.getDescription().getContent() != null) {
-              return definition.getDescription().getContent();
-            }
-            if (!definition.getComments().isEmpty()) {
-              return definition.getComments().stream()
-                  .map(Comment::getContent)
-                  .collect(Collectors.joining(" "));
-            }
-            return null;
-          }
-        });
-  }
-
+  
   public boolean isSchemaSorted(String schemaContent, String sortedContent) {
     return schemaContent.equals(sortedContent);
   }
