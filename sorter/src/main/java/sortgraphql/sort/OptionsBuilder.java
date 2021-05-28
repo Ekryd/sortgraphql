@@ -1,10 +1,8 @@
 package sortgraphql.sort;
 
-import graphql.schema.DefaultGraphqlTypeComparatorRegistry;
-import graphql.schema.GraphQLDirective;
-import graphql.schema.GraphQLSchemaElement;
-import graphql.schema.GraphqlTypeComparatorRegistry;
+import graphql.schema.*;
 
+import java.util.Comparator;
 import java.util.function.Predicate;
 
 public class OptionsBuilder {
@@ -17,7 +15,7 @@ public class OptionsBuilder {
   private boolean descriptionsAsHashComments;
   private Predicate<GraphQLDirective> includeDirective;
   private Predicate<GraphQLSchemaElement> includeSchemaElement;
-  private GraphqlTypeComparatorRegistry comparatorRegistry;
+  private DefaultGraphqlTypeComparatorRegistry.Builder comparatorRegistryBuilder = DefaultGraphqlTypeComparatorRegistry.newComparators();
 
   private OptionsBuilder() {}
 
@@ -123,13 +121,12 @@ public class OptionsBuilder {
    *
    * <p>The default is to sort elements by name but you can put in your own code to decide on the
    * field order
-   *
-   * @param comparatorRegistry The registry containing the {@code Comparator} and environment
-   *     scoping rules.
-   * @return options
    */
-  public OptionsBuilder setComparatorRegistry(GraphqlTypeComparatorRegistry comparatorRegistry) {
-    this.comparatorRegistry = comparatorRegistry;
+  public <T extends GraphQLType> OptionsBuilder addComparatorToRegistry(GraphqlTypeComparatorEnvironment environment, Comparator<? super T> comparator) {
+
+    @SuppressWarnings("unchecked") 
+    Class<T> clazz = (Class<T>) GraphQLType.class;
+    this.comparatorRegistryBuilder.addComparator(environment, clazz, comparator);
     return this;
   }
 
@@ -144,7 +141,7 @@ public class OptionsBuilder {
         descriptionsAsHashComments,
         includeDirective,
         includeSchemaElement,
-        comparatorRegistry);
+        comparatorRegistryBuilder.build());
   }
 
   public static OptionsBuilder defaultOptions() {
@@ -157,7 +154,6 @@ public class OptionsBuilder {
         .setUseAstDefinitions(false)
         .setDescriptionsAsHashComments(false)
         .setIncludeDirective(directive -> true)
-        .setIncludeSchemaElement(element -> true)
-        .setComparatorRegistry(DefaultGraphqlTypeComparatorRegistry.defaultComparators());
+        .setIncludeSchemaElement(element -> true);
   }
 }

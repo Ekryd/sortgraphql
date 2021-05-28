@@ -1,57 +1,64 @@
 package cucumber;
 
-import io.cucumber.java.Before;
-import io.cucumber.java.Scenario;
+import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import sortgraphql.SorterService;
+import sortgraphql.logger.SortingLogger;
+import sortgraphql.parameter.PluginParameters;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
 
-/**
- * Step definitions for cucumber tests
- */
+/** Step definitions for cucumber tests */
 public class StepDefinitions {
-    private String unsortedSchema;
-    private URI scenarioUri;
+  private final PluginParameters.Builder paramBuilder = PluginParameters.builder();
+  private String unsortedSchema;
+  private SortingLogger log = mock(SortingLogger.class);
 
-    @Before
-    public void beforeCucumberStep(Scenario scenario) {
-        scenarioUri = scenario.getUri();
-    }
+  @ParameterType(value = "true|True|TRUE|false|False|FALSE")
+  public Boolean booleanValue(String value) {
+    return Boolean.valueOf(value);
+  }
 
-    @Given("schema content")
-    public void schemaContent(String unsortedSchema) {
-        this.unsortedSchema = unsortedSchema;
-    }
+  @Given("schema content")
+  public void schemaContent(String unsortedSchema) {
+    this.unsortedSchema = unsortedSchema;
+  }
 
-    @Then("sorted schema")
-    public void sortedSchema(String expectedSchema) {
-        String sortedSchema = new SorterService().sortSchema(unsortedSchema);
-        assertThat(sortedSchema, is(expectedSchema));
-    }
+  @Then("sorted schema")
+  public void sortedSchema(String expectedSchema) {
+    SorterService sorterService = new SorterService();
+    sorterService.setup(log, paramBuilder.build());
+    String sortedSchema = sorterService.sortSchema(unsortedSchema);
+    assertThat(sortedSchema, is(expectedSchema));
+  }
 
-    @Given("schema content file {string}")
-    public void schemaContentFileBasic_productsGraphqls(String filename) {
-        schemaContent(getContentFromFileName(filename));
-    }
+  @Given("schema content file {string}")
+  public void schemaContentFileBasic_productsGraphqls(String filename) {
+    schemaContent(getContentFromFileName(filename));
+  }
 
-    private String getContentFromFileName(String filename) {
-        InputStream schemaStream = StepDefinitions.class.getResourceAsStream(filename);
-        try {
-            return new String(schemaStream.readAllBytes());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+  private String getContentFromFileName(String filename) {
+    InputStream schemaStream = StepDefinitions.class.getResourceAsStream(filename);
+    try {
+      return new String(schemaStream.readAllBytes());
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    @Then("sorted schema file {string}")
-    public void sortedSchemaFile(String sortedFilename) {
-        sortedSchema(getContentFromFileName(sortedFilename));
-    }
+  @Then("sorted schema file {string}")
+  public void sortedSchemaFile(String sortedFilename) {
+    sortedSchema(getContentFromFileName(sortedFilename));
+  }
+
+  @Given("skip union type sorting is {booleanValue}")
+  public void skipUnionTypeSortingIsTrue(boolean flag) {
+    paramBuilder.setSorting(flag);
+  }
 }

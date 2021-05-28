@@ -61,6 +61,10 @@ sortgraphql:sort
       User property: sortgraphql.skip
       Set this to 'true' to bypass SortGraphQL plugin
 
+    skipUnionTypeSorting (Default: false)
+      User property: sortgraphql.skipUnionTypeSorting
+      Skip sorting the types in a union.
+
 
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS

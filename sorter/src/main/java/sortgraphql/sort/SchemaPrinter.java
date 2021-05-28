@@ -9,7 +9,10 @@ import graphql.schema.visibility.GraphqlFieldVisibility;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -33,7 +36,7 @@ public class SchemaPrinter {
           .name("deprecated")
           .validLocations(FIELD_DEFINITION, ENUM_VALUE, ARGUMENT_DEFINITION, INPUT_FIELD_DEFINITION)
           .build();
-  
+
   private final Options options;
   private final TypePrinter<GraphQLSchema> schemaPrinter = schemaPrinter();
   private final TypePrinter<GraphQLObjectType> objectPrinter = objectPrinter();

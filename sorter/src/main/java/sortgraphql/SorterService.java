@@ -1,5 +1,8 @@
 package sortgraphql;
 
+import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLUnionType;
+import graphql.schema.GraphqlTypeComparatorEnvironment;
 import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
@@ -12,6 +15,7 @@ import sortgraphql.sort.SchemaPrinter;
 import sortgraphql.util.FileUtil;
 
 import java.io.File;
+import java.util.Comparator;
 
 /** Contain the concrete methods to sort the schema */
 public class SorterService {
@@ -23,12 +27,14 @@ public class SorterService {
   private File schemaFile;
   private boolean createBackupFile;
   private String backupFileExtension;
+  private boolean skipUnionTypeSorting;
 
   public void setup(SortingLogger log, PluginParameters pluginParameters) {
     this.log = log;
     this.schemaFile = pluginParameters.schemaFile;
     this.createBackupFile = pluginParameters.createBackupFile;
     this.backupFileExtension = pluginParameters.backupFileExtension;
+    this.skipUnionTypeSorting = pluginParameters.skipUnionTypeSorting;
 
     fileUtil.setup(pluginParameters);
   }
@@ -47,10 +53,14 @@ public class SorterService {
         OptionsBuilder.defaultOptions()
             .setDescriptionsAsHashComments(true)
             .setIncludeDirectiveDefinitions(false)
-            .setIncludeDefinedDirectiveDefinitions(true)
-            .build();
+            .setIncludeDefinedDirectiveDefinitions(true);
+    
+    if (skipUnionTypeSorting) {
+      GraphqlTypeComparatorEnvironment environment = GraphqlTypeComparatorEnvironment.newEnvironment().parentType(GraphQLUnionType.class).elementType(GraphQLOutputType.class).build();
+      options.addComparatorToRegistry(environment, (Comparator<GraphQLOutputType>) (o1, o2) -> 0)  ;
+    }
 
-    return new SchemaPrinter(options).print(graphQLSchema);
+    return new SchemaPrinter(options.build()).print(graphQLSchema);
   }
 
   public boolean isSchemaSorted(String schemaContent, String sortedContent) {

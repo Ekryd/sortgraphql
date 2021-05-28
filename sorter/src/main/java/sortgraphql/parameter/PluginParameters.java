@@ -8,12 +8,14 @@ public class PluginParameters {
     public final boolean createBackupFile;
     public final String backupFileExtension;
     public final String encoding;
+    public final boolean skipUnionTypeSorting;
 
-    public PluginParameters(File schemaFile, boolean createBackupFile, String backupFileExtension, String encoding) {
+    public PluginParameters(File schemaFile, boolean createBackupFile, String backupFileExtension, String encoding, boolean skipUnionTypeSorting) {
         this.schemaFile = schemaFile;
         this.createBackupFile = createBackupFile;
         this.backupFileExtension = backupFileExtension;
         this.encoding = encoding;
+        this.skipUnionTypeSorting = skipUnionTypeSorting;
     }
 
     public static Builder builder() {
@@ -26,6 +28,7 @@ public class PluginParameters {
         private boolean createBackupFile;
         private String backupFileExtension;
         private String encoding;
+        private boolean skipUnionTypeSorting;
 
         private Builder() {
         }
@@ -49,9 +52,15 @@ public class PluginParameters {
             return this;
         }
 
+        /** Sets sorting options */
+        public Builder setSorting(boolean skipUnionTypeSorting) {
+            this.skipUnionTypeSorting = skipUnionTypeSorting;
+            return this;
+        }
+
         /** Build the PluginParameters instance */
         public PluginParameters build() {
-            return new PluginParameters(schemaFile, createBackupFile, backupFileExtension, encoding);
+            return new PluginParameters(schemaFile, createBackupFile, backupFileExtension, encoding, skipUnionTypeSorting);
         }
     }
 

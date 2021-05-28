@@ -1,7 +1,7 @@
 Feature: Sorting annotations in different ways
   
   Scenario: Default arguments should not be printed
-    Given schema content
+    When schema content
 """
 directive @something(name: String = "a default name", title: String) on FIELD_DEFINITION
 

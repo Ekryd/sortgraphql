@@ -1,7 +1,7 @@
 Feature: Sorting GraphQL Schemas
 
   Scenario: basic query schema
-    Given schema content
+    When schema content
 """
 schema
 @graph(name: "accounts", url: "https://accounts.api.com")
