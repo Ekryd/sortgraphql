@@ -16,7 +16,7 @@ public class SortMojo extends AbstractParentMojo {
     @Override
     public void setup() throws MojoFailureException {
         new ExceptionConverter(() -> {
-            PluginParameters pluginParameters = PluginParameters.builder()
+            var pluginParameters = PluginParameters.builder()
                     .setSchemaFile(schemaFile)
                     .setFileOutput(createBackupFile, backupFileExtension)
                     .setEncoding(encoding)

@@ -124,8 +124,8 @@ public class OptionsBuilder {
    */
   public <T extends GraphQLType> OptionsBuilder addComparatorToRegistry(GraphqlTypeComparatorEnvironment environment, Comparator<? super T> comparator) {
 
-    @SuppressWarnings("unchecked") 
-    Class<T> clazz = (Class<T>) GraphQLType.class;
+    @SuppressWarnings("unchecked")
+    var clazz = (Class<T>) GraphQLType.class;
     this.comparatorRegistryBuilder.addComparator(environment, clazz, comparator);
     return this;
   }

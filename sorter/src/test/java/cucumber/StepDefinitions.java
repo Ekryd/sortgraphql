@@ -9,7 +9,6 @@ import sortgraphql.parameter.PluginParameters;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -33,9 +32,9 @@ public class StepDefinitions {
 
   @Then("sorted schema")
   public void sortedSchema(String expectedSchema) {
-    SorterService sorterService = new SorterService();
+    var sorterService = new SorterService();
     sorterService.setup(log, paramBuilder.setSchemaFile(new File("name")).build());
-    String sortedSchema = sorterService.sortSchema(unsortedSchema);
+    var sortedSchema = sorterService.sortSchema(unsortedSchema);
     assertThat(sortedSchema, is(expectedSchema));
   }
 
@@ -45,7 +44,7 @@ public class StepDefinitions {
   }
 
   private String getContentFromFileName(String filename) {
-    InputStream schemaStream = StepDefinitions.class.getResourceAsStream(filename);
+    var schemaStream = StepDefinitions.class.getResourceAsStream(filename);
     try {
       return new String(schemaStream.readAllBytes());
     } catch (IOException e) {

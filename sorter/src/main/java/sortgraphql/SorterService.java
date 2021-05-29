@@ -1,7 +1,6 @@
 package sortgraphql;
 
 import graphql.schema.*;
-import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import sortgraphql.exception.FailureException;
 import sortgraphql.logger.SortingLogger;
@@ -45,7 +44,7 @@ public class SorterService {
 
   public String sortSchema(String schema) {
     var registry = new SchemaParser().parse(schema, schemaFile.getName());
-    RuntimeWiring runtimeWiring = wiringFactory.createFakeRuntime(registry);
+    var runtimeWiring = wiringFactory.createFakeRuntime(registry);
 
     var graphQLSchema = new SchemaGenerator().makeExecutableSchema(registry, runtimeWiring);
 
@@ -56,7 +55,7 @@ public class SorterService {
             .setIncludeDefinedDirectiveDefinitions(true);
 
     if (skipUnionTypeSorting) {
-      GraphqlTypeComparatorEnvironment environment =
+      var environment =
           GraphqlTypeComparatorEnvironment.newEnvironment()
               .parentType(GraphQLUnionType.class)
               .elementType(GraphQLOutputType.class)
@@ -64,7 +63,7 @@ public class SorterService {
       options.addComparatorToRegistry(environment, (Comparator<GraphQLOutputType>) (o1, o2) -> 0);
     }
     if (skipFieldArgumentSorting) {
-      GraphqlTypeComparatorEnvironment environment =
+      var environment =
           GraphqlTypeComparatorEnvironment.newEnvironment()
               .parentType(GraphQLFieldDefinition.class)
               .elementType(GraphQLArgument.class)

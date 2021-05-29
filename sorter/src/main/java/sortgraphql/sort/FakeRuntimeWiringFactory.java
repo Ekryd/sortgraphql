@@ -9,7 +9,6 @@ import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.ScalarInfo;
 import graphql.schema.idl.TypeDefinitionRegistry;
 
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /** */
@@ -35,7 +34,7 @@ public class FakeRuntimeWiringFactory {
   public RuntimeWiring createFakeRuntime(TypeDefinitionRegistry registry) {
     return EchoingWiringFactory.newEchoingWiring(
         wiringBuilder -> {
-          Map<String, ScalarTypeDefinition> scalars = registry.scalars();
+          var scalars = registry.scalars();
           scalars.forEach(
               (name, v) -> {
                 if (!ScalarInfo.isGraphqlSpecifiedScalar(name)) {

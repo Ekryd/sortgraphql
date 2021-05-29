@@ -24,8 +24,8 @@ public class SorterImpl {
     public void sortSchema() {
         log.info("Sorting file " + schemaFile.getAbsolutePath());
 
-        String schemaContent = sorterService.getSchemaContent();
-        String sortedContent = sorterService.sortSchema(schemaContent);
+        var schemaContent = sorterService.getSchemaContent();
+        var sortedContent = sorterService.sortSchema(schemaContent);
         if (sorterService.isSchemaSorted(schemaContent, sortedContent)) {
             log.info("Schema file is already sorted, exiting");
             return;

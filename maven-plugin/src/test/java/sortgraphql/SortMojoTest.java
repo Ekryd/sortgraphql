@@ -24,7 +24,7 @@ class SortMojoTest {
     @BeforeEach
     void setup() {
         sortMojo = new SortMojo();
-        ReflectionHelper mojoHelper = new ReflectionHelper(sortMojo);
+        var mojoHelper = new ReflectionHelper(sortMojo);
         mojoHelper.setField(sorter);
     }
 
@@ -43,7 +43,7 @@ class SortMojoTest {
 
         final Executable testMethod = () -> sortMojo.execute();
 
-        final MojoFailureException thrown = assertThrows(MojoFailureException.class, testMethod);
+        final var thrown = assertThrows(MojoFailureException.class, testMethod);
 
         assertThat("Unexpected message", thrown.getMessage(), is(equalTo("Gurka")));
     }
@@ -54,7 +54,7 @@ class SortMojoTest {
 
         final Executable testMethod = () -> sortMojo.setup();
 
-        final MojoFailureException thrown = assertThrows(MojoFailureException.class, testMethod);
+        final var thrown = assertThrows(MojoFailureException.class, testMethod);
 
         assertThat("Unexpected message", thrown.getMessage(), is(equalTo("Gurka")));
     }
