@@ -1,4 +1,4 @@
-Feature: Sorting annotations in different ways
+Feature: Sorting unions in different ways
   
   Scenario: Unions are sorted by default
     When schema content

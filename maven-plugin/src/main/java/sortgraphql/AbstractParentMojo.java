@@ -42,6 +42,12 @@ abstract class AbstractParentMojo extends AbstractMojo {
     protected boolean skipUnionTypeSorting;
 
     /**
+     * Skip sorting the arguments for a field in a type.
+     */
+    @Parameter(property = "sortgraphql.skipFieldArgumentSorting", defaultValue = "false")
+    protected boolean skipFieldArgumentSorting;
+
+    /**
      * Set this to 'true' to bypass SortGraphQL plugin
      */
     @Parameter(property = "sortgraphql.skip", defaultValue = "false")

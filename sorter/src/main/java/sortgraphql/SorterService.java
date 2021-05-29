@@ -1,8 +1,6 @@
 package sortgraphql;
 
-import graphql.schema.GraphQLOutputType;
-import graphql.schema.GraphQLUnionType;
-import graphql.schema.GraphqlTypeComparatorEnvironment;
+import graphql.schema.*;
 import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
@@ -28,6 +26,7 @@ public class SorterService {
   private boolean createBackupFile;
   private String backupFileExtension;
   private boolean skipUnionTypeSorting;
+  private boolean skipFieldArgumentSorting;
 
   public void setup(SortingLogger log, PluginParameters pluginParameters) {
     this.log = log;
@@ -35,6 +34,7 @@ public class SorterService {
     this.createBackupFile = pluginParameters.createBackupFile;
     this.backupFileExtension = pluginParameters.backupFileExtension;
     this.skipUnionTypeSorting = pluginParameters.skipUnionTypeSorting;
+    this.skipFieldArgumentSorting = pluginParameters.skipFieldArgumentSorting;
 
     fileUtil.setup(pluginParameters);
   }
@@ -54,10 +54,22 @@ public class SorterService {
             .setDescriptionsAsHashComments(true)
             .setIncludeDirectiveDefinitions(false)
             .setIncludeDefinedDirectiveDefinitions(true);
-    
+
     if (skipUnionTypeSorting) {
-      GraphqlTypeComparatorEnvironment environment = GraphqlTypeComparatorEnvironment.newEnvironment().parentType(GraphQLUnionType.class).elementType(GraphQLOutputType.class).build();
-      options.addComparatorToRegistry(environment, (Comparator<GraphQLOutputType>) (o1, o2) -> 0)  ;
+      GraphqlTypeComparatorEnvironment environment =
+          GraphqlTypeComparatorEnvironment.newEnvironment()
+              .parentType(GraphQLUnionType.class)
+              .elementType(GraphQLOutputType.class)
+              .build();
+      options.addComparatorToRegistry(environment, (Comparator<GraphQLOutputType>) (o1, o2) -> 0);
+    }
+    if (skipFieldArgumentSorting) {
+      GraphqlTypeComparatorEnvironment environment =
+          GraphqlTypeComparatorEnvironment.newEnvironment()
+              .parentType(GraphQLFieldDefinition.class)
+              .elementType(GraphQLArgument.class)
+              .build();
+      options.addComparatorToRegistry(environment, (Comparator<GraphQLArgument>) (o1, o2) -> 0);
     }
 
     return new SchemaPrinter(options.build()).print(graphQLSchema);

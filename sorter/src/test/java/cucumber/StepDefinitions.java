@@ -18,7 +18,7 @@ import static org.mockito.Mockito.mock;
 public class StepDefinitions {
   private final PluginParameters.Builder paramBuilder = PluginParameters.builder();
   private String unsortedSchema;
-  private SortingLogger log = mock(SortingLogger.class);
+  private final SortingLogger log = mock(SortingLogger.class);
 
   @ParameterType(value = "true|True|TRUE|false|False|FALSE")
   public Boolean booleanValue(String value) {
@@ -59,6 +59,11 @@ public class StepDefinitions {
 
   @Given("skip union type sorting is {booleanValue}")
   public void skipUnionTypeSortingIsTrue(boolean flag) {
-    paramBuilder.setSorting(flag);
+    paramBuilder.setSorting(flag, paramBuilder.build().skipFieldArgumentSorting);
+  }
+
+  @Given("skip field argument sorting is {booleanValue}")
+  public void skipFieldArgumentSorting(boolean flag) {
+    paramBuilder.setSorting(paramBuilder.build().skipUnionTypeSorting, flag);
   }
 }

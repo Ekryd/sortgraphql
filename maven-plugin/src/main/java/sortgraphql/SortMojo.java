@@ -20,7 +20,7 @@ public class SortMojo extends AbstractParentMojo {
                     .setSchemaFile(schemaFile)
                     .setFileOutput(createBackupFile, backupFileExtension)
                     .setEncoding(encoding)
-                    .setSorting(skipUnionTypeSorting)
+                    .setSorting(skipUnionTypeSorting, skipFieldArgumentSorting)
                     .build();
 
             sorter.setup(new MavenLogger(getLog()), pluginParameters);

@@ -1,0 +1,17 @@
+union Something = B | C | A
+
+directive @enhance(b: String, c: String, a: String) on FIELD_DEFINITION
+
+type Query {
+  thing(b: String, c: String, a: String): String @enhance(c: "C", a: "A", b: "B")
+}
+
+type A {
+  thing: String
+}
+type B {
+  thing: String
+}
+type C {
+  thing: String
+}
