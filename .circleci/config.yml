@@ -43,7 +43,7 @@ workflows:
   version: 2
   work:
     jobs:
-      - jdk15:
+      - jdk15
       - jdk16:
           requires:
             - jdk15
