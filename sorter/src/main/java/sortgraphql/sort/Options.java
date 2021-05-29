@@ -11,7 +11,6 @@ public class Options {
 
   private final boolean includeIntrospectionTypes;
   private final boolean includeScalars;
-  private final boolean useAstDefinitions;
   private final boolean includeSchemaDefinition;
   private final boolean includeDirectiveDefinitions;
   private final boolean includeDefinedDirectiveDefinitions;
@@ -26,7 +25,6 @@ public class Options {
       boolean includeSchemaDefinition,
       boolean includeDirectiveDefinitions,
       boolean includeDefinedDirectiveDefinitions,
-      boolean useAstDefinitions,
       boolean descriptionsAsHashComments,
       Predicate<GraphQLDirective> includeDirective,
       Predicate<GraphQLSchemaElement> includeSchemaElement,
@@ -37,7 +35,6 @@ public class Options {
     this.includeDirectiveDefinitions = includeDirectiveDefinitions;
     this.includeDefinedDirectiveDefinitions = includeDefinedDirectiveDefinitions;
     this.includeDirective = includeDirective;
-    this.useAstDefinitions = useAstDefinitions;
     this.descriptionsAsHashComments = descriptionsAsHashComments;
     this.comparatorRegistry = comparatorRegistry;
     this.includeSchemaElement = includeSchemaElement;
@@ -77,9 +74,5 @@ public class Options {
 
   public GraphqlTypeComparatorRegistry getComparatorRegistry() {
     return comparatorRegistry;
-  }
-
-  public boolean isUseAstDefinitions() {
-    return useAstDefinitions;
   }
 }

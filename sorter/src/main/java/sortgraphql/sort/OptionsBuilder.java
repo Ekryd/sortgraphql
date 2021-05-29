@@ -11,7 +11,6 @@ public class OptionsBuilder {
   private boolean includeSchemaDefinition;
   private boolean includeDirectiveDefinitions;
   private boolean includeDefinedDirectiveDefinitions;
-  private boolean useAstDefinitions;
   private boolean descriptionsAsHashComments;
   private Predicate<GraphQLDirective> includeDirective;
   private Predicate<GraphQLSchemaElement> includeSchemaElement;
@@ -74,16 +73,6 @@ public class OptionsBuilder {
   }
 
   /**
-   * Allow to print directives. In some situations, auto-generated schemas contain a lot of
-   * directives that make the printout noisy and having this flag would allow cleaner printout. On
-   * by default.
-   */
-  public OptionsBuilder setUseAstDefinitions(boolean useAstDefinitions) {
-    this.useAstDefinitions = useAstDefinitions;
-    return this;
-  }
-
-  /**
    * Descriptions are defined as preceding string literals, however an older legacy versions of SDL
    * supported preceding '#' comments as descriptions. Set this to true to enable this deprecated
    * behavior. This option is provided to ease adoption and may be removed in future versions.
@@ -137,7 +126,6 @@ public class OptionsBuilder {
         includeSchemaDefinition,
         includeDirectiveDefinitions,
         includeDefinedDirectiveDefinitions,
-        useAstDefinitions,
         descriptionsAsHashComments,
         includeDirective,
         includeSchemaElement,
@@ -151,7 +139,6 @@ public class OptionsBuilder {
         .setIncludeSchemaDefinition(false)
         .setIncludeDirectiveDefinitions(true)
         .setIncludeDefinedDirectiveDefinitions(false)
-        .setUseAstDefinitions(false)
         .setDescriptionsAsHashComments(false)
         .setIncludeDirective(directive -> true)
         .setIncludeSchemaElement(element -> true);
