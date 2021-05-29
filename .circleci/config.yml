@@ -15,17 +15,13 @@ shared: &shared
         key: sortgraphql-cache--{{ checksum "pom.xml" }}
       
 jobs:
-  jdk8:
-    docker:
-      - image: cimg/openjdk:8.0
-    <<: *shared
   jdk15:
     docker:
       - image: cimg/openjdk:15.0
     <<: *shared
   jdk16:
     docker:
-      - image: cimg/openjdk:14.0
+      - image: cimg/openjdk:16.0
     <<: *shared
   jdk11:
     docker:
@@ -47,20 +43,16 @@ workflows:
   version: 2
   work:
     jobs:
-      - jdk8
       - jdk15:
-          requires:
-            - jdk8
       - jdk16:
           requires:
-            - jdk8
+            - jdk15
       - jdk11:
           filters:  # using regex filters requires the entire branch to match
             branches:              
               only:  # only branches matching the below regex filters will run
                 - master
           requires:
-            - jdk8
             - jdk15
             - jdk16
         
