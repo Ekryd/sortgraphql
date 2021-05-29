@@ -3,12 +3,12 @@ package sortgraphql;
 import graphql.schema.*;
 import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
-import graphql.schema.idl.SchemaParser;
 import sortgraphql.exception.FailureException;
 import sortgraphql.logger.SortingLogger;
 import sortgraphql.parameter.PluginParameters;
 import sortgraphql.sort.FakeRuntimeWiringFactory;
 import sortgraphql.sort.OptionsBuilder;
+import sortgraphql.sort.SchemaParser;
 import sortgraphql.sort.SchemaPrinter;
 import sortgraphql.util.FileUtil;
 
@@ -44,7 +44,7 @@ public class SorterService {
   }
 
   public String sortSchema(String schema) {
-    var registry = new SchemaParser().parse(schema);
+    var registry = new SchemaParser().parse(schema, schemaFile.getName());
     RuntimeWiring runtimeWiring = wiringFactory.createFakeRuntime(registry);
 
     var graphQLSchema = new SchemaGenerator().makeExecutableSchema(registry, runtimeWiring);

@@ -7,6 +7,7 @@ import sortgraphql.SorterService;
 import sortgraphql.logger.SortingLogger;
 import sortgraphql.parameter.PluginParameters;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -33,7 +34,7 @@ public class StepDefinitions {
   @Then("sorted schema")
   public void sortedSchema(String expectedSchema) {
     SorterService sorterService = new SorterService();
-    sorterService.setup(log, paramBuilder.build());
+    sorterService.setup(log, paramBuilder.setSchemaFile(new File("name")).build());
     String sortedSchema = sorterService.sortSchema(unsortedSchema);
     assertThat(sortedSchema, is(expectedSchema));
   }
