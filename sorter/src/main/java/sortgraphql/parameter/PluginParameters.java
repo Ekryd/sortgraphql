@@ -1,10 +1,13 @@
 package sortgraphql.parameter;
 
 import java.io.File;
+import java.util.List;
+
+import static java.util.Collections.singletonList;
 
 /** Contains all parameters that are sent to the plugin */
 public class PluginParameters {
-  public final File schemaFile;
+  public final List<File> schemaFiles;
   public final boolean createBackupFile;
   public final String backupFileExtension;
   public final String encoding;
@@ -12,13 +15,13 @@ public class PluginParameters {
   public final boolean skipFieldArgumentSorting;
 
   public PluginParameters(
-      File schemaFile,
+      List<File> schemaFiles,
       boolean createBackupFile,
       String backupFileExtension,
       String encoding,
       boolean skipUnionTypeSorting,
       boolean skipFieldArgumentSorting) {
-    this.schemaFile = schemaFile;
+    this.schemaFiles = schemaFiles;
     this.createBackupFile = createBackupFile;
     this.backupFileExtension = backupFileExtension;
     this.encoding = encoding;
@@ -32,7 +35,7 @@ public class PluginParameters {
 
   /** Builder for the PluginParameters class */
   public static class Builder {
-    private File schemaFile;
+    private List<File> schemaFiles;
     private boolean createBackupFile;
     private String backupFileExtension;
     private String encoding;
@@ -42,8 +45,10 @@ public class PluginParameters {
     private Builder() {}
 
     /** Sets schema file location */
-    public Builder setSchemaFile(File schemaFile) {
-      this.schemaFile = schemaFile;
+    public Builder setSchemaFile(File schemaFile, List<File> schemaFiles) {
+      if (schemaFiles == null || schemaFiles.isEmpty())
+        this.schemaFiles = singletonList(schemaFile);
+      else this.schemaFiles = schemaFiles;
       return this;
     }
 
@@ -70,7 +75,7 @@ public class PluginParameters {
     /** Build the PluginParameters instance */
     public PluginParameters build() {
       return new PluginParameters(
-          schemaFile,
+          schemaFiles,
           createBackupFile,
           backupFileExtension,
           encoding,

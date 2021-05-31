@@ -1,7 +1,7 @@
 Feature: Sorting GraphQL Schemas
 
   Scenario: basic query schema
-    When schema content
+    When unsorted schema content
 """
 schema
 @graph(name: "accounts", url: "https://accounts.api.com")
@@ -135,7 +135,7 @@ interface Vehicle
 
 union Thing = Car | Product
 """
-    Then sorted schema 
+    Then sorted schema content
 """
 directive @composedGraph(version: Int!) on SCHEMA
 directive @graph(name: String!, url: String!) repeatable on SCHEMA

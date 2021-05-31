@@ -17,56 +17,58 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class SortMojoTest {
-    private final SorterImpl sorter = mock(SorterImpl.class);
-    private final Log log = mock(Log.class);
-    private SortMojo sortMojo;
+  private final SorterImpl sorter = mock(SorterImpl.class);
+  private final Log log = mock(Log.class);
+  private SortMojo sortMojo;
 
-    @BeforeEach
-    void setup() {
-        sortMojo = new SortMojo();
-        var mojoHelper = new ReflectionHelper(sortMojo);
-        mojoHelper.setField(sorter);
-    }
+  @BeforeEach
+  void setup() {
+    sortMojo = new SortMojo();
+    var mojoHelper = new ReflectionHelper(sortMojo);
+    mojoHelper.setField(sorter);
+  }
 
-    @Test
-    void executeShouldStartMojo() throws Exception {
-        sortMojo.execute();
+  @Test
+  void executeShouldStartMojo() throws Exception {
+    sortMojo.execute();
 
-        verify(sorter).setup(any(SortingLogger.class), any(PluginParameters.class));
-        verify(sorter).sortSchema();
-        verifyNoMoreInteractions(sorter);
-    }
+    verify(sorter).setup(any(SortingLogger.class), any(PluginParameters.class));
+    verify(sorter).sortSchemas();
+    verifyNoMoreInteractions(sorter);
+  }
 
-    @Test
-    void thrownExceptionShouldBeConvertedToMojoException() {
-        doThrow(new FailureException("Gurka")).when(sorter).sortSchema();
+  @Test
+  void thrownExceptionShouldBeConvertedToMojoException() {
+    doThrow(new FailureException("Gurka")).when(sorter).sortSchemas();
 
-        final Executable testMethod = () -> sortMojo.execute();
+    final Executable testMethod = () -> sortMojo.execute();
 
-        final var thrown = assertThrows(MojoFailureException.class, testMethod);
+    final var thrown = assertThrows(MojoFailureException.class, testMethod);
 
-        assertThat("Unexpected message", thrown.getMessage(), is(equalTo("Gurka")));
-    }
+    assertThat("Unexpected message", thrown.getMessage(), is(equalTo("Gurka")));
+  }
 
-    @Test
-    void thrownExceptionShouldBeConvertedToMojoExceptionInSetup() {
-        doThrow(new FailureException("Gurka")).when(sorter).setup(any(SortingLogger.class), any(PluginParameters.class));
+  @Test
+  void thrownExceptionShouldBeConvertedToMojoExceptionInSetup() {
+    doThrow(new FailureException("Gurka"))
+        .when(sorter)
+        .setup(any(SortingLogger.class), any(PluginParameters.class));
 
-        final Executable testMethod = () -> sortMojo.setup();
+    final Executable testMethod = () -> sortMojo.setup();
 
-        final var thrown = assertThrows(MojoFailureException.class, testMethod);
+    final var thrown = assertThrows(MojoFailureException.class, testMethod);
 
-        assertThat("Unexpected message", thrown.getMessage(), is(equalTo("Gurka")));
-    }
+    assertThat("Unexpected message", thrown.getMessage(), is(equalTo("Gurka")));
+  }
 
-    @Test
-    void skipParameterShouldSkipExecution() throws Exception {
-        new ReflectionHelper(sortMojo).setField("skip", true);
-        new ReflectionHelper(sortMojo).setField(log);
+  @Test
+  void skipParameterShouldSkipExecution() throws Exception {
+    new ReflectionHelper(sortMojo).setField("skip", true);
+    new ReflectionHelper(sortMojo).setField(log);
 
-        sortMojo.execute();
+    sortMojo.execute();
 
-        verify(log).info("Skipping SortGraphQL");
-        verifyNoMoreInteractions(sorter);
-    }
+    verify(log).info("Skipping SortGraphQL");
+    verifyNoMoreInteractions(sorter);
+  }
 }

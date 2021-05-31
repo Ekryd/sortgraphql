@@ -1,0 +1,14 @@
+type Mutation {
+    cure(moonPhase: MoonRequest): Person @supernatural(scary: false)
+    bite(victim: Victim): Werewolf @supernatural(scary: true)
+}
+
+input Victim {
+    traits: KindType
+}
+
+type Cat implements Animal {
+    doesHowl: Boolean
+    howl: Howl
+   traits: KindType 
+}

@@ -1,22 +1,35 @@
 package sortgraphql.sort;
 
+import graphql.language.AbstractDescribedNode;
 import graphql.schema.*;
 
 import java.util.Comparator;
 import java.util.function.Predicate;
 
 public class OptionsBuilder {
+  private final DefaultGraphqlTypeComparatorRegistry.Builder comparatorRegistryBuilder =
+      DefaultGraphqlTypeComparatorRegistry.newComparators();
   private boolean includeIntrospectionTypes;
   private boolean includeScalars;
   private boolean includeSchemaDefinition;
   private boolean includeDirectiveDefinitions;
   private boolean includeDefinedDirectiveDefinitions;
   private boolean descriptionsAsHashComments;
-  private Predicate<GraphQLDirective> includeDirective;
-  private Predicate<GraphQLSchemaElement> includeSchemaElement;
-  private DefaultGraphqlTypeComparatorRegistry.Builder comparatorRegistryBuilder = DefaultGraphqlTypeComparatorRegistry.newComparators();
+  private Predicate<GraphQLDirective> includeDirective = directive -> true;
+  private Predicate<GraphQLSchemaElement> includeSchemaElement = element -> true;
+  private Predicate<AbstractDescribedNode<?>> nodeDescriptionFilter = node -> true;
 
   private OptionsBuilder() {}
+
+  public static OptionsBuilder defaultOptions() {
+    return new OptionsBuilder()
+        .setIncludeIntrospectionTypes(false)
+        .setIncludeScalars(true)
+        .setIncludeSchemaDefinition(false)
+        .setIncludeDirectiveDefinitions(true)
+        .setIncludeDefinedDirectiveDefinitions(false)
+        .setDescriptionsAsHashComments(false);
+  }
 
   /** This will allow you to include introspection types that are contained in a schema */
   public OptionsBuilder setIncludeIntrospectionTypes(boolean includeIntrospectionTypes) {
@@ -111,11 +124,19 @@ public class OptionsBuilder {
    * <p>The default is to sort elements by name but you can put in your own code to decide on the
    * field order
    */
-  public <T extends GraphQLType> OptionsBuilder addComparatorToRegistry(GraphqlTypeComparatorEnvironment environment, Comparator<? super T> comparator) {
+  public <T extends GraphQLType> OptionsBuilder addComparatorToRegistry(
+      GraphqlTypeComparatorEnvironment environment, Comparator<? super T> comparator) {
 
     @SuppressWarnings("unchecked")
     var clazz = (Class<T>) GraphQLType.class;
     this.comparatorRegistryBuilder.addComparator(environment, clazz, comparator);
+    return this;
+  }
+
+  /** This is a general purpose Predicate that decides whether any type of node is printed ever. */
+  public OptionsBuilder setNodeDescriptionFilter(
+      Predicate<AbstractDescribedNode<?>> nodeDescriptionFilter) {
+    this.nodeDescriptionFilter = nodeDescriptionFilter;
     return this;
   }
 
@@ -129,18 +150,7 @@ public class OptionsBuilder {
         descriptionsAsHashComments,
         includeDirective,
         includeSchemaElement,
-        comparatorRegistryBuilder.build());
-  }
-
-  public static OptionsBuilder defaultOptions() {
-    return new OptionsBuilder()
-        .setIncludeIntrospectionTypes(false)
-        .setIncludeScalars(true)
-        .setIncludeSchemaDefinition(false)
-        .setIncludeDirectiveDefinitions(true)
-        .setIncludeDefinedDirectiveDefinitions(false)
-        .setDescriptionsAsHashComments(false)
-        .setIncludeDirective(directive -> true)
-        .setIncludeSchemaElement(element -> true);
+        comparatorRegistryBuilder.build(),
+        nodeDescriptionFilter);
   }
 }

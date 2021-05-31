@@ -1,7 +1,9 @@
 package sortgraphql;
 
+import graphql.language.AbstractDescribedNode;
 import graphql.schema.*;
 import graphql.schema.idl.SchemaGenerator;
+import graphql.schema.idl.TypeDefinitionRegistry;
 import sortgraphql.exception.FailureException;
 import sortgraphql.logger.SortingLogger;
 import sortgraphql.parameter.PluginParameters;
@@ -12,7 +14,9 @@ import sortgraphql.sort.SchemaPrinter;
 import sortgraphql.util.FileUtil;
 
 import java.io.File;
-import java.util.Comparator;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /** Contain the concrete methods to sort the schema */
 public class SorterService {
@@ -21,7 +25,6 @@ public class SorterService {
 
   private SortingLogger log;
 
-  private File schemaFile;
   private boolean createBackupFile;
   private String backupFileExtension;
   private boolean skipUnionTypeSorting;
@@ -29,7 +32,6 @@ public class SorterService {
 
   public void setup(SortingLogger log, PluginParameters pluginParameters) {
     this.log = log;
-    this.schemaFile = pluginParameters.schemaFile;
     this.createBackupFile = pluginParameters.createBackupFile;
     this.backupFileExtension = pluginParameters.backupFileExtension;
     this.skipUnionTypeSorting = pluginParameters.skipUnionTypeSorting;
@@ -38,21 +40,33 @@ public class SorterService {
     fileUtil.setup(pluginParameters);
   }
 
-  public String getSchemaContent() {
-    return fileUtil.getSchemaContent();
+  public Map<File, String> getSchemaContents(List<File> schemaFiles) {
+    return schemaFiles.stream()
+        .collect(
+            Collectors.toMap(
+                file -> file, fileUtil::getSchemaContent, (s1, s2) -> s1, LinkedHashMap::new));
   }
 
-  public String sortSchema(String schema) {
-    var registry = new SchemaParser().parse(schema, schemaFile.getName());
+  public GraphQLSchema createMergedSchema(Collection<String> schemaContents, List<File> fileNames) {
+    TypeDefinitionRegistry registry = new TypeDefinitionRegistry();
+
+    var nameIterator = fileNames.iterator();
+    SchemaParser schemaParser = new SchemaParser();
+    schemaContents.forEach(
+        schemaContent ->
+            registry.merge(schemaParser.parse(schemaContent, nameIterator.next().getName())));
+
     var runtimeWiring = wiringFactory.createFakeRuntime(registry);
 
-    var graphQLSchema = new SchemaGenerator().makeExecutableSchema(registry, runtimeWiring);
+    return new SchemaGenerator().makeExecutableSchema(registry, runtimeWiring);
+  }
 
+  public String sortSchema(GraphQLSchema graphQLSchema, String schemaFileName) {
     var options =
         OptionsBuilder.defaultOptions()
-            .setDescriptionsAsHashComments(true)
             .setIncludeDirectiveDefinitions(false)
-            .setIncludeDefinedDirectiveDefinitions(true);
+            .setIncludeDefinedDirectiveDefinitions(true)
+            .setDescriptionsAsHashComments(true);
 
     if (skipUnionTypeSorting) {
       var environment =
@@ -70,29 +84,40 @@ public class SorterService {
               .build();
       options.addComparatorToRegistry(environment, (Comparator<GraphQLArgument>) (o1, o2) -> 0);
     }
+    options.setNodeDescriptionFilter(sourceLocationPredicate(schemaFileName));
 
     return new SchemaPrinter(options.build()).print(graphQLSchema);
+  }
+
+  private Predicate<AbstractDescribedNode<?>> sourceLocationPredicate(String schemaFileName) {
+    return node -> {
+      if (node == null || node.getSourceLocation() == null) {
+        // If we cannot find description or source location, just print the node
+        return true;
+      }
+      return schemaFileName.equals(node.getSourceLocation().getSourceName());
+    };
   }
 
   public boolean isSchemaSorted(String schemaContent, String sortedContent) {
     return schemaContent.equals(sortedContent);
   }
 
-  public void createBackupFile() {
+  public void createBackupFile(File schemaFile) {
     if (!createBackupFile) {
       return;
     }
     if (backupFileExtension.trim().length() == 0) {
       throw new FailureException("Could not create backup file, extension name was empty");
     }
-    fileUtil.backupFile();
+    fileUtil.backupFile(schemaFile);
     log.info(
         String.format(
             "Saved backup of %s to %s%s",
             schemaFile.getAbsolutePath(), schemaFile.getAbsolutePath(), backupFileExtension));
   }
 
-  public void saveSortedContent(String sortedContent) {
-    fileUtil.saveSchema(sortedContent);
+  public void saveSortedContent(String sortedContent, File schemaFile) {
+    fileUtil.saveSchema(sortedContent, schemaFile);
   }
 }
