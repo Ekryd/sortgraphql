@@ -51,7 +51,7 @@ public class StepDefinitions {
   @When("unsorted schema file {string}")
   public void unsortedSchemaFile(String unsortedSchemaFilename) {
     pluginParameters =
-        paramBuilder.setSchemaFile(new File("unsortedSchemaFilename"), emptyList()).build();
+        paramBuilder.setSchemaFile(new File("name"), emptyList()).build();
     this.unsortedSchemas =
         Collections.singletonList(getContentFromFileName(unsortedSchemaFilename));
   }

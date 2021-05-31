@@ -1,0 +1,31 @@
+directive @supernatural(scary: Boolean = true) on FIELD_DEFINITION
+
+type Query {
+    me: Person
+    fullmoon(moonPhase: MoonRequest): Werewolf    @supernatural(scary: true)
+}
+
+input MoonRequest {
+    full: Boolean
+}
+
+scalar Howl
+
+union Werewolf = Person | Wolf
+
+interface Animal {
+    doesHowl: Boolean
+}
+
+type Wolf {
+    doesHowl: Boolean
+    howl: Howl
+}
+
+type Person {
+   traits: KindType 
+}
+
+enum KindType {
+    KIND
+}
