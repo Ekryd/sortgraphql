@@ -17,7 +17,7 @@ public class OptionsBuilder {
   private boolean descriptionsAsHashComments;
   private Predicate<GraphQLDirective> includeDirective = directive -> true;
   private Predicate<GraphQLSchemaElement> includeSchemaElement = element -> true;
-  private Predicate<AbstractDescribedNode<?>> nodeFilter = node -> true;
+  private Predicate<AbstractDescribedNode<?>> nodeDescriptionFilter = node -> true;
 
   private OptionsBuilder() {}
 
@@ -124,7 +124,8 @@ public class OptionsBuilder {
    * <p>The default is to sort elements by name but you can put in your own code to decide on the
    * field order
    */
-  public <T extends GraphQLType> OptionsBuilder addComparatorToRegistry(GraphqlTypeComparatorEnvironment environment, Comparator<? super T> comparator) {
+  public <T extends GraphQLType> OptionsBuilder addComparatorToRegistry(
+      GraphqlTypeComparatorEnvironment environment, Comparator<? super T> comparator) {
 
     @SuppressWarnings("unchecked")
     var clazz = (Class<T>) GraphQLType.class;
@@ -133,8 +134,9 @@ public class OptionsBuilder {
   }
 
   /** This is a general purpose Predicate that decides whether any type of node is printed ever. */
-  public OptionsBuilder setNodeFilter(Predicate<AbstractDescribedNode<?>> nodeFilter) {
-    this.nodeFilter = nodeFilter;
+  public OptionsBuilder setNodeDescriptionFilter(
+      Predicate<AbstractDescribedNode<?>> nodeDescriptionFilter) {
+    this.nodeDescriptionFilter = nodeDescriptionFilter;
     return this;
   }
 
@@ -149,6 +151,6 @@ public class OptionsBuilder {
         includeDirective,
         includeSchemaElement,
         comparatorRegistryBuilder.build(),
-        nodeFilter);
+        nodeDescriptionFilter);
   }
 }

@@ -1,5 +1,6 @@
 package sortgraphql;
 
+import graphql.language.AbstractDescribedNode;
 import graphql.schema.*;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.TypeDefinitionRegistry;
@@ -14,6 +15,7 @@ import sortgraphql.util.FileUtil;
 
 import java.io.File;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /** Contain the concrete methods to sort the schema */
@@ -63,7 +65,8 @@ public class SorterService {
     var options =
         OptionsBuilder.defaultOptions()
             .setIncludeDirectiveDefinitions(false)
-            .setIncludeDefinedDirectiveDefinitions(true);
+            .setIncludeDefinedDirectiveDefinitions(true)
+            .setDescriptionsAsHashComments(true);
 
     if (skipUnionTypeSorting) {
       var environment =
@@ -81,8 +84,19 @@ public class SorterService {
               .build();
       options.addComparatorToRegistry(environment, (Comparator<GraphQLArgument>) (o1, o2) -> 0);
     }
+    options.setNodeDescriptionFilter(sourceLocationPredicate(schemaFileName));
 
     return new SchemaPrinter(options.build()).print(graphQLSchema);
+  }
+
+  private Predicate<AbstractDescribedNode<?>> sourceLocationPredicate(String schemaFileName) {
+    return node -> {
+      if (node == null || node.getSourceLocation() == null) {
+        // If we cannot find description or source location, just print the node
+        return true;
+      }
+      return schemaFileName.equals(node.getSourceLocation().getSourceName());
+    };
   }
 
   public boolean isSchemaSorted(String schemaContent, String sortedContent) {

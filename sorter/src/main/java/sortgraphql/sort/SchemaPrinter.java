@@ -159,6 +159,9 @@ public class SchemaPrinter {
       if (!options.isIncludeScalars()) {
         return;
       }
+      if (!options.getNodeDescriptionFilter().test(type.getDefinition())) {
+        return;
+      }
       boolean printScalar;
       if (ScalarInfo.isGraphqlSpecifiedScalar(type)) {
         printScalar = false;
@@ -181,6 +184,9 @@ public class SchemaPrinter {
   private TypePrinter<GraphQLEnumType> enumPrinter() {
     return (out, type, visibility) -> {
       if (isIntrospectionType(type)) {
+        return;
+      }
+      if (!options.getNodeDescriptionFilter().test(type.getDefinition())) {
         return;
       }
 
@@ -226,6 +232,7 @@ public class SchemaPrinter {
     out.format("{\n");
     fieldDefinitions.stream()
         .filter(options.getIncludeSchemaElement())
+        .filter(fd -> options.getNodeDescriptionFilter().test(fd.getDefinition()))
         .sorted(comparator)
         .forEach(
             fd -> {
@@ -248,6 +255,9 @@ public class SchemaPrinter {
   private TypePrinter<GraphQLInterfaceType> interfacePrinter() {
     return (out, type, visibility) -> {
       if (isIntrospectionType(type)) {
+        return;
+      }
+      if (!options.getNodeDescriptionFilter().test(type.getDefinition())) {
         return;
       }
       printComments(out, type, "");
@@ -297,6 +307,9 @@ public class SchemaPrinter {
       if (isIntrospectionType(type)) {
         return;
       }
+      if (!options.getNodeDescriptionFilter().test(type.getDefinition())) {
+        return;
+      }
 
       var environment =
           GraphqlTypeComparatorEnvironment.newEnvironment()
@@ -324,6 +337,9 @@ public class SchemaPrinter {
   private TypePrinter<GraphQLObjectType> objectPrinter() {
     return (out, type, visibility) -> {
       if (isIntrospectionType(type)) {
+        return;
+      }
+      if (!options.getNodeDescriptionFilter().test(type.getDefinition())) {
         return;
       }
       printComments(out, type, "");
@@ -371,6 +387,9 @@ public class SchemaPrinter {
   private TypePrinter<GraphQLInputObjectType> inputObjectPrinter() {
     return (out, type, visibility) -> {
       if (isIntrospectionType(type)) {
+        return;
+      }
+      if (!options.getNodeDescriptionFilter().test(type.getDefinition())) {
         return;
       }
       printComments(out, type, "");
@@ -478,6 +497,7 @@ public class SchemaPrinter {
     return schema.getDirectives().stream()
         .filter(options.getIncludeDirective())
         .filter(options.getIncludeSchemaElement())
+        .filter(d -> options.getNodeDescriptionFilter().test(d.getDefinition()))
         .sorted(Comparator.comparing(GraphQLDirective::getName))
         .collect(toList());
   }

@@ -21,14 +21,18 @@ class SorterServiceTest {
 
   @Test
   void testMultipleSchemas() {
+    String sortSchema =
+        getOneSortedSchema(
+            List.of(
+                new File("src/test/resources/schema.graphqls"),
+                new File("src/test/resources/mutations.graphqls")),
+            "schema.graphqls");
+    //    System.out.println(sortSchema);
+  }
+
+  private String getOneSortedSchema(List<File> schemaFiles, String schemaFileName) {
     PluginParameters pluginParameters =
-        PluginParameters.builder()
-            .setSchemaFile(
-                null,
-                List.of(
-                    new File("src/test/resources/schema.graphqls"),
-                    new File("src/test/resources/mutations.graphqls")))
-            .build();
+        PluginParameters.builder().setSchemaFile(null, schemaFiles).build();
 
     sorterService.setup(log, pluginParameters);
 
@@ -39,7 +43,7 @@ class SorterServiceTest {
     GraphQLSchema mergedSchema =
         sorterService.createMergedSchema(contents, pluginParameters.schemaFiles);
 
-    String sortSchema = sorterService.sortSchema(mergedSchema, "mutations.graphqls");
-    System.out.println(sortSchema);
+    String sortSchema = sorterService.sortSchema(mergedSchema, schemaFileName);
+    return sortSchema;
   }
 }
