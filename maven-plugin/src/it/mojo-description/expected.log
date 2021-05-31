@@ -61,8 +61,8 @@ sortgraphql:sort
     schemaFiles
       User property: sortgraphql.schemaFiles
       Location of multiple graphql schema file that should be sorted. Overrides
-      parameter schemaFile. The later schema files can reference earlier
-      schemas, but shared types is not allowed.
+      parameter schemaFile. The schema files can reference each other, but
+      shared definitions is not allowed.
 
     skip (Default: false)
       User property: sortgraphql.skip

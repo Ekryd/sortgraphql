@@ -25,4 +25,3 @@ Feature: Sorting GraphQL Schemas
       | wolfMain.graphqls |
       | wolfAdd.graphqls  |
     Then sorted schema "wolfAdd.graphqls" file "wolfAdd_expected.graphqls"
-
