@@ -1,0 +1,22 @@
+type Query {
+  me: User
+  users(filter: UserFilter): [User]
+}
+
+input UserFilter {
+  nrResults: Int = 5
+  nameMatches: UserNameMatcher
+}
+
+input UserNameMatcher {
+  startsWith: String
+  contains: String
+  length: Int
+}
+
+type User @key(fields: "id") {
+  id: ID!
+  name: String
+  username(uppercase: Boolean = false): String
+}
+

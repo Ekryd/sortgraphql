@@ -26,3 +26,13 @@ Feature: Sorting GraphQL Schemas
       | wolfAdd.graphqls  |
     Then sorted schema "wolfAdd.graphqls" file "wolfAdd_expected.graphqls"
 
+  Scenario: sorting multiple files (verify addition)
+    When unsorted schema files
+      | fed_base.graphqls |
+      | fed_product.graphqls  |
+      | fed_user.graphqls  |
+      | fed_advertisement.graphqls  |
+      | fed_inventory.graphqls  |
+      | fed_review.graphqls  |
+    Then sorted schema "fed_product.graphqls" file "fed_product.graphqls"
+

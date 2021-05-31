@@ -1,0 +1,26 @@
+type Query {
+  topAds(first: Int = 5): [Advertisement]
+}
+
+type Advertisement
+@key(fields: "id")
+{
+  id: ID!
+  title: String
+  body: String
+  reviews: ReviewPage
+}
+
+type Review
+@extends
+@key(fields: "id")
+{
+  id: ID! @external
+}
+
+type ReviewPage
+@extends
+@key(fields: "items")
+{
+  items: [Review] @external
+}    
