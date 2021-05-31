@@ -48,10 +48,10 @@ public class SorterService {
   }
 
   public GraphQLSchema createMergedSchema(Collection<String> schemaContents, List<File> fileNames) {
-    TypeDefinitionRegistry registry = new TypeDefinitionRegistry();
+    var registry = new TypeDefinitionRegistry();
 
     var nameIterator = fileNames.iterator();
-    SchemaParser schemaParser = new SchemaParser();
+    var schemaParser = new SchemaParser();
     schemaContents.forEach(
         schemaContent ->
             registry.merge(schemaParser.parse(schemaContent, nameIterator.next().getName())));

@@ -1,6 +1,5 @@
 package cucumber;
 
-import graphql.schema.GraphQLSchema;
 import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -58,7 +57,7 @@ public class StepDefinitions {
 
   @When("unsorted schema files")
   public void unsortedSchemaFile(List<String> filenames) {
-    List<File> files = filenames.stream().map(File::new).collect(Collectors.toList());
+    var files = filenames.stream().map(File::new).collect(Collectors.toList());
     pluginParameters = paramBuilder.setSchemaFile(null, files).build();
     this.unsortedSchemas =
         filenames.stream().map(this::getContentFromFileName).collect(Collectors.toList());
@@ -94,7 +93,7 @@ public class StepDefinitions {
   private void assertSortedSchema(String schemaName, String expectedSchemaContent) {
     var sorterService = new SorterService();
     sorterService.setup(log, pluginParameters);
-    GraphQLSchema mergedSchema =
+    var mergedSchema =
         sorterService.createMergedSchema(unsortedSchemas, pluginParameters.schemaFiles);
     var sortedSchema = sorterService.sortSchema(mergedSchema, schemaName);
     assertThat(sortedSchema, is(expectedSchemaContent));
