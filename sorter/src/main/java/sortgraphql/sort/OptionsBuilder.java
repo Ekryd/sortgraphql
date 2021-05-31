@@ -1,22 +1,35 @@
 package sortgraphql.sort;
 
+import graphql.language.AbstractDescribedNode;
 import graphql.schema.*;
 
 import java.util.Comparator;
 import java.util.function.Predicate;
 
 public class OptionsBuilder {
+  private final DefaultGraphqlTypeComparatorRegistry.Builder comparatorRegistryBuilder =
+      DefaultGraphqlTypeComparatorRegistry.newComparators();
   private boolean includeIntrospectionTypes;
   private boolean includeScalars;
   private boolean includeSchemaDefinition;
   private boolean includeDirectiveDefinitions;
   private boolean includeDefinedDirectiveDefinitions;
   private boolean descriptionsAsHashComments;
-  private Predicate<GraphQLDirective> includeDirective;
-  private Predicate<GraphQLSchemaElement> includeSchemaElement;
-  private DefaultGraphqlTypeComparatorRegistry.Builder comparatorRegistryBuilder = DefaultGraphqlTypeComparatorRegistry.newComparators();
+  private Predicate<GraphQLDirective> includeDirective = directive -> true;
+  private Predicate<GraphQLSchemaElement> includeSchemaElement = element -> true;
+  private Predicate<AbstractDescribedNode<?>> nodeFilter = node -> true;
 
   private OptionsBuilder() {}
+
+  public static OptionsBuilder defaultOptions() {
+    return new OptionsBuilder()
+        .setIncludeIntrospectionTypes(false)
+        .setIncludeScalars(true)
+        .setIncludeSchemaDefinition(false)
+        .setIncludeDirectiveDefinitions(true)
+        .setIncludeDefinedDirectiveDefinitions(false)
+        .setDescriptionsAsHashComments(false);
+  }
 
   /** This will allow you to include introspection types that are contained in a schema */
   public OptionsBuilder setIncludeIntrospectionTypes(boolean includeIntrospectionTypes) {
@@ -119,6 +132,12 @@ public class OptionsBuilder {
     return this;
   }
 
+  /** This is a general purpose Predicate that decides whether any type of node is printed ever. */
+  public OptionsBuilder setNodeFilter(Predicate<AbstractDescribedNode<?>> nodeFilter) {
+    this.nodeFilter = nodeFilter;
+    return this;
+  }
+
   public Options build() {
     return new Options(
         includeIntrospectionTypes,
@@ -129,18 +148,7 @@ public class OptionsBuilder {
         descriptionsAsHashComments,
         includeDirective,
         includeSchemaElement,
-        comparatorRegistryBuilder.build());
-  }
-
-  public static OptionsBuilder defaultOptions() {
-    return new OptionsBuilder()
-        .setIncludeIntrospectionTypes(false)
-        .setIncludeScalars(true)
-        .setIncludeSchemaDefinition(false)
-        .setIncludeDirectiveDefinitions(true)
-        .setIncludeDefinedDirectiveDefinitions(false)
-        .setDescriptionsAsHashComments(false)
-        .setIncludeDirective(directive -> true)
-        .setIncludeSchemaElement(element -> true);
+        comparatorRegistryBuilder.build(),
+        nodeFilter);
   }
 }

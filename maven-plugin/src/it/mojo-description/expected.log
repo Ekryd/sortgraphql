@@ -55,7 +55,14 @@ sortgraphql:sort
 
     schemaFile (Default: src/main/resources/schema.graphqls)
       User property: sortgraphql.schemaFile
-      Location of the graphql schema file that should be sorted.
+      Location of the graphql schema file that should be sorted. If multiple,
+      use schemaFiles.
+
+    schemaFiles
+      User property: sortgraphql.schemaFiles
+      Location of multiple graphql schema file that should be sorted. Overrides
+      parameter schemaFile. The later schema files can reference earlier
+      schemas, but shared types is not allowed.
 
     skip (Default: false)
       User property: sortgraphql.skip

@@ -1,5 +1,6 @@
 package sortgraphql.sort;
 
+import graphql.language.AbstractDescribedNode;
 import graphql.schema.GraphQLDirective;
 import graphql.schema.GraphQLSchemaElement;
 import graphql.schema.GraphqlTypeComparatorRegistry;
@@ -18,6 +19,7 @@ public class Options {
   private final Predicate<GraphQLDirective> includeDirective;
   private final Predicate<GraphQLSchemaElement> includeSchemaElement;
   private final GraphqlTypeComparatorRegistry comparatorRegistry;
+  private final Predicate<AbstractDescribedNode<?>> nodeFilter;
 
   Options(
       boolean includeIntrospectionTypes,
@@ -28,7 +30,8 @@ public class Options {
       boolean descriptionsAsHashComments,
       Predicate<GraphQLDirective> includeDirective,
       Predicate<GraphQLSchemaElement> includeSchemaElement,
-      GraphqlTypeComparatorRegistry comparatorRegistry) {
+      GraphqlTypeComparatorRegistry comparatorRegistry,
+      Predicate<AbstractDescribedNode<?>> nodeFilter) {
     this.includeIntrospectionTypes = includeIntrospectionTypes;
     this.includeScalars = includeScalars;
     this.includeSchemaDefinition = includeSchemaDefinition;
@@ -38,6 +41,7 @@ public class Options {
     this.descriptionsAsHashComments = descriptionsAsHashComments;
     this.comparatorRegistry = comparatorRegistry;
     this.includeSchemaElement = includeSchemaElement;
+    this.nodeFilter = nodeFilter;
   }
 
   public boolean isIncludeIntrospectionTypes() {
@@ -74,5 +78,9 @@ public class Options {
 
   public GraphqlTypeComparatorRegistry getComparatorRegistry() {
     return comparatorRegistry;
+  }
+
+  public Predicate<AbstractDescribedNode<?>> getNodeFilter() {
+    return nodeFilter;
   }
 }

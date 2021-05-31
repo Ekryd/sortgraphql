@@ -13,13 +13,11 @@ import java.nio.file.Files;
 
 /** Used to interface with file system */
 public class FileUtil {
-  private File schemaFile;
   private String backupFileExtension;
   private String encoding;
 
   /** Initializes the class with plugin parameters. */
   public void setup(PluginParameters parameters) {
-    this.schemaFile = parameters.schemaFile;
     this.backupFileExtension = parameters.backupFileExtension;
     this.encoding = parameters.encoding;
   }
@@ -29,7 +27,7 @@ public class FileUtil {
    *
    * @return Content of the file
    */
-  public String getSchemaContent() {
+  public String getSchemaContent(File schemaFile) {
     String content;
     try (InputStream inputStream = new FileInputStream(schemaFile)) {
       content = IOUtils.toString(inputStream, encoding);
@@ -42,7 +40,7 @@ public class FileUtil {
   }
 
   /** Saves a backup of the schema file before saving. */
-  public void backupFile() {
+  public void backupFile(File schemaFile) {
     var newName = schemaFile.getAbsolutePath() + backupFileExtension;
     var backupFile = new File(newName);
     try {
@@ -62,7 +60,7 @@ public class FileUtil {
    *
    * @param sortedSchema The content to save
    */
-  public void saveSchema(String sortedSchema) {
+  public void saveSchema(String sortedSchema, File schemaFile) {
     saveFile(
         schemaFile,
         sortedSchema,
