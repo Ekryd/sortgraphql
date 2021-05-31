@@ -174,8 +174,8 @@ public class SchemaPrinter {
     out.format(
         "enum %s%s", type.getName(), directivesString(GraphQLEnumType.class, type.getDirectives()));
     var values = type.getValues().stream().sorted(comparator).collect(toList());
-    if (values.size() > 0) {
-      out.format(" {\n");
+    if (!values.isEmpty()) {
+      out.append(" {\n");
       for (var enumValueDefinition : values) {
         printComments(out, enumValueDefinition, "  ");
         var enumValueDirectives = enumValueDefinition.getDirectives();
@@ -187,20 +187,20 @@ public class SchemaPrinter {
             enumValueDefinition.getName(),
             directivesString(GraphQLEnumValueDefinition.class, enumValueDirectives));
       }
-      out.format("}");
+      out.append("}");
     }
-    out.format("\n\n");
+    out.append("\n\n");
   }
 
   private void printFieldDefinitions(
       PrintWriter out,
       Comparator<? super GraphQLSchemaElement> comparator,
       List<GraphQLFieldDefinition> fieldDefinitions) {
-    if (fieldDefinitions.size() == 0) {
+    if (fieldDefinitions.isEmpty()) {
       return;
     }
 
-    out.format("{\n");
+    out.append("{\n");
     fieldDefinitions.stream()
         .filter(options.getIncludeSchemaElement())
         .filter(fd -> options.getNodeDescriptionFilter().test(fd.getDefinition()))
@@ -220,7 +220,7 @@ public class SchemaPrinter {
                   typeString(fd.getType()),
                   directivesString(GraphQLFieldDefinition.class, fieldDirectives));
             });
-    out.format("}");
+    out.append("}");
   }
 
   private void printInterface(
@@ -267,7 +267,7 @@ public class SchemaPrinter {
     var comparator = options.getComparatorRegistry().getComparator(environment);
 
     printFieldDefinitions(out, comparator, visibility.getFieldDefinitions(type));
-    out.format("\n\n");
+    out.append("\n\n");
   }
 
   private void printUnion(PrintWriter out, GraphQLUnionType type) {
@@ -293,11 +293,11 @@ public class SchemaPrinter {
     for (var i = 0; i < types.size(); i++) {
       var objectType = types.get(i);
       if (i > 0) {
-        out.format(" | ");
+        out.append(" | ");
       }
-      out.format("%s", objectType.getName());
+      out.append(objectType.getName());
     }
-    out.format("\n\n");
+    out.append("\n\n");
   }
 
   private void printObject(
@@ -344,7 +344,7 @@ public class SchemaPrinter {
     var comparator = options.getComparatorRegistry().getComparator(environment);
 
     printFieldDefinitions(out, comparator, visibility.getFieldDefinitions(type));
-    out.format("\n\n");
+    out.append("\n\n");
   }
 
   private void printInput(
@@ -367,8 +367,8 @@ public class SchemaPrinter {
         "input %s%s",
         type.getName(), directivesString(GraphQLInputObjectType.class, type.getDirectives()));
     var inputObjectFields = visibility.getFieldDefinitions(type);
-    if (inputObjectFields.size() > 0) {
-      out.format(" {\n");
+    if (!inputObjectFields.isEmpty()) {
+      out.append(" {\n");
       inputObjectFields.stream()
           .filter(options.getIncludeSchemaElement())
           .sorted(comparator)
@@ -382,11 +382,11 @@ public class SchemaPrinter {
                   out.format(" = %s", astValue);
                 }
                 out.format(directivesString(GraphQLInputObjectField.class, fd.getDirectives()));
-                out.format("\n");
+                out.append("\n");
               });
-      out.format("}");
+      out.append("}");
     }
-    out.format("\n\n");
+    out.append("\n\n");
   }
 
   private static String printAst(Object value, GraphQLInputType type) {
@@ -431,13 +431,13 @@ public class SchemaPrinter {
       if (subscriptionType != null) {
         out.format("  subscription: %s\n", subscriptionType.getName());
       }
-      out.format("}\n\n");
+      out.append("}\n\n");
     }
 
     if (options.isIncludeDirectiveDefinitions()) {
       var directives = getSchemaDirectives(schema);
       if (!directives.isEmpty()) {
-        out.format("%s", directiveDefinitions(directives));
+        out.append(directiveDefinitions(directives));
       }
     } else if (options.isIncludeDefinedDirectiveDefinitions()) {
       var directives =
@@ -448,7 +448,7 @@ public class SchemaPrinter {
                           && directive.getDefinition().getSourceLocation() != null)
               .collect(Collectors.toList());
       if (!directives.isEmpty()) {
-        out.format("%s", directiveDefinitions(directives));
+        out.append(directiveDefinitions(directives));
       }
     }
   }
