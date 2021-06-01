@@ -6,7 +6,7 @@
 
   <groupId>com.github.ekryd.sortgraphql</groupId>
   <artifactId>sortgraphql-parent</artifactId>
-  <version>0.0.2-SNAPSHOT</version>
+  <version>0.0.2</version>
   <packaging>pom</packaging>
   <name>SortGraphQL</name>
   <description>A Maven plugin that sorts GraphQL Schemas</description>
@@ -415,7 +415,7 @@
     <connection>scm:git:https://github.com/Ekryd/sortgraphql.git</connection>
     <developerConnection>scm:git:https://github.com/Ekryd/sortgraphql.git</developerConnection>
     <url>https://github.com/Ekryd/sortgraphql</url>
-    <tag>HEAD</tag>
+    <tag>sortgraphql-parent-0.0.2</tag>
   </scm>
   <issueManagement>
     <system>GitHub</system>
