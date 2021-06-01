@@ -21,7 +21,7 @@ abstract class AbstractParentMojo extends AbstractMojo {
 
   /**
    * Location of multiple graphql schema file that should be sorted. Overrides parameter schemaFile.
-   * The schema files can reference each other, but shared definitions is not allowed.
+   * The schema files can reference each other, but shared definitions are not allowed.
    */
   @Parameter(property = "sortgraphql.schemaFiles")
   protected List<File> schemaFiles;

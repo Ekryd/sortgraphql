@@ -13,8 +13,6 @@
         <artifactId>sortgraphql-maven-plugin</artifactId>
         <version>@pom.version@</version>
         <configuration>
-          <skipFieldArgumentSorting>true</skipFieldArgumentSorting>
-          <skipUnionTypeSorting>true</skipUnionTypeSorting>
           <schemaFile>ignored.graphqls</schemaFile>
           <schemaFiles>
             <schemaFile>src/main/resources/wolfMain.graphqls</schemaFile>
