@@ -53,7 +53,7 @@ public class PluginParameters {
     }
 
     /** Sets information regarding backup file */
-    public Builder setFileOutput(final boolean createBackupFile, final String backupFileExtension) {
+    public Builder setBackup(final boolean createBackupFile, final String backupFileExtension) {
       this.createBackupFile = createBackupFile;
       this.backupFileExtension = backupFileExtension;
       return this;

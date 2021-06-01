@@ -18,7 +18,7 @@ public class SortMojo extends AbstractParentMojo {
               var pluginParameters =
                   PluginParameters.builder()
                       .setSchemaFile(schemaFile, schemaFiles)
-                      .setFileOutput(createBackupFile, backupFileExtension)
+                      .setBackup(createBackupFile, backupFileExtension)
                       .setEncoding(encoding)
                       .setSorting(skipUnionTypeSorting, skipFieldArgumentSorting)
                       .build();

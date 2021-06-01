@@ -41,17 +41,31 @@ public class FileUtil {
 
   /** Saves a backup of the schema file before saving. */
   public void backupFile(File schemaFile) {
-    var newName = schemaFile.getAbsolutePath() + backupFileExtension;
-    var backupFile = new File(newName);
+    var backupFile = createBackupFileHandle(schemaFile);
+    deleteExistingBackupFile(backupFile);
+    createBackupFile(schemaFile, backupFile);
+  }
+
+  File createBackupFileHandle(File schemaFile) {
+    var backupFilename = schemaFile.getAbsolutePath() + backupFileExtension;
+    return new File(backupFilename);
+  }
+
+  private void deleteExistingBackupFile(File backupFile) {
     try {
       Files.deleteIfExists(backupFile.toPath());
     } catch (IOException e) {
-      throw new FailureException("Could not remove old backup file, filename: " + newName, e);
+      throw new FailureException(
+          "Could not remove old backup file, filename: " + backupFile.getAbsolutePath(), e);
     }
+  }
+
+  private void createBackupFile(File schemaFile, File backupFile) {
     try {
       Files.copy(schemaFile.toPath(), backupFile.toPath());
     } catch (IOException e) {
-      throw new FailureException("Could not create backup file to filename: " + newName, e);
+      throw new FailureException(
+          "Could not create backup file to filename: " + backupFile.getAbsolutePath(), e);
     }
   }
 
