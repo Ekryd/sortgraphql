@@ -20,7 +20,12 @@ directive @stream on FIELD
 directive @transform(from: String!) on FIELD
 
 
+"""
+This is a 
+long comment
+"""
 type Query {
+    "Shorter comment"
     topProducts(first: Int = 5): [Product] @resolve(graph: "product")
     me: User @resolve(graph: "accounts")
     users(filter: UserFilter): [User] @resolve(graph: "accounts")
@@ -41,10 +46,13 @@ input UserNameMatcher
     length: Int
 }
 
+#This is an old 
+#long comment
 type Advertisement
 @owner(graph: "advertisement")
 @key(fields: "{id}", graph: "advertisement")
 {
+    #Old shorter comment
     id: ID!
     title: String
     body: String

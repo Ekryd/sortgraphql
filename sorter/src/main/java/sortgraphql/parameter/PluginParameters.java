@@ -15,6 +15,7 @@ public class PluginParameters {
   public final boolean skipFieldArgumentSorting;
   public final boolean generateSchemaDefinition;
   public final boolean generateAllDirectiveDefinitions;
+  public final boolean descriptionsAsHashComments;
 
   public PluginParameters(
       List<File> schemaFiles,
@@ -22,7 +23,10 @@ public class PluginParameters {
       String backupFileExtension,
       String encoding,
       boolean skipUnionTypeSorting,
-      boolean skipFieldArgumentSorting, boolean generateSchemaDefinition, boolean generateAllDirectiveDefinitions) {
+      boolean skipFieldArgumentSorting,
+      boolean generateSchemaDefinition,
+      boolean generateAllDirectiveDefinitions,
+      boolean descriptionsAsHashComments) {
     this.schemaFiles = schemaFiles;
     this.createBackupFile = createBackupFile;
     this.backupFileExtension = backupFileExtension;
@@ -31,6 +35,7 @@ public class PluginParameters {
     this.skipFieldArgumentSorting = skipFieldArgumentSorting;
     this.generateSchemaDefinition = generateSchemaDefinition;
     this.generateAllDirectiveDefinitions = generateAllDirectiveDefinitions;
+    this.descriptionsAsHashComments = descriptionsAsHashComments;
   }
 
   public static Builder builder() {
@@ -47,6 +52,7 @@ public class PluginParameters {
     private boolean skipFieldArgumentSorting;
     private boolean generateSchemaDefinition;
     private boolean generateAllDirectiveDefinitions;
+    private boolean descriptionsAsHashComments;
 
     private Builder() {}
 
@@ -77,10 +83,14 @@ public class PluginParameters {
       this.skipFieldArgumentSorting = skipFieldArgumentSorting;
       return this;
     }
-    
-    public Builder setGenerationOptions(boolean generateSchemaDefinition, boolean generateAllDirectiveDefinitions) {
+
+    public Builder setGenerationOptions(
+        boolean generateSchemaDefinition,
+        boolean generateAllDirectiveDefinitions,
+        boolean descriptionsAsHashComments) {
       this.generateSchemaDefinition = generateSchemaDefinition;
       this.generateAllDirectiveDefinitions = generateAllDirectiveDefinitions;
+      this.descriptionsAsHashComments = descriptionsAsHashComments;
       return this;
     }
 
@@ -92,9 +102,10 @@ public class PluginParameters {
           backupFileExtension,
           encoding,
           skipUnionTypeSorting,
-          skipFieldArgumentSorting, 
+          skipFieldArgumentSorting,
           generateSchemaDefinition,
-          generateAllDirectiveDefinitions);
+          generateAllDirectiveDefinitions,
+          descriptionsAsHashComments);
     }
   }
 }

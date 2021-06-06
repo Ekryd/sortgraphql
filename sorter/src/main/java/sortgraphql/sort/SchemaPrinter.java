@@ -140,18 +140,20 @@ public class SchemaPrinter {
     }
 
     if (needsSchemaPrinted) {
-      out.format("schema%s{\n", 
-          schemaDirectives.isEmpty()
-              ? " "
-              : "\n" + directivesString(GraphQLSchemaElement.class, schemaDirectives));
+      out.format(
+              "schema%s{",
+              schemaDirectives.isEmpty()
+                  ? " "
+                  : "\n" + directivesString(GraphQLSchemaElement.class, schemaDirectives))
+          .append("\n");
       if (queryType != null) {
-        out.format("  query: %s\n", queryType.getName());
+        out.format("  query: %s", queryType.getName()).append("\n");
       }
       if (mutationType != null) {
-        out.format("  mutation: %s\n", mutationType.getName());
+        out.format("  mutation: %s", mutationType.getName()).append("\n");
       }
       if (subscriptionType != null) {
-        out.format("  subscription: %s\n", subscriptionType.getName());
+        out.format("  subscription: %s", subscriptionType.getName()).append("\n");
       }
       out.append("}\n\n");
     }
@@ -184,8 +186,9 @@ public class SchemaPrinter {
     }
     printComments(out, type, "");
     out.format(
-        "scalar %s%s\n\n",
-        type.getName(), directivesString(GraphQLScalarType.class, type.getDirectives()));
+            "scalar %s%s",
+            type.getName(), directivesString(GraphQLScalarType.class, type.getDirectives()))
+        .append("\n\n");
   }
 
   private void printInterface(
@@ -382,9 +385,10 @@ public class SchemaPrinter {
           enumValueDirectives = addDeprecatedDirectiveIfNeeded(enumValueDirectives);
         }
         out.format(
-            "  %s%s\n",
-            enumValueDefinition.getName(),
-            directivesString(GraphQLEnumValueDefinition.class, enumValueDirectives));
+                "  %s%s",
+                enumValueDefinition.getName(),
+                directivesString(GraphQLEnumValueDefinition.class, enumValueDirectives))
+            .append("\n");
       }
       out.append("}");
     }
@@ -439,11 +443,12 @@ public class SchemaPrinter {
               }
 
               out.format(
-                  "  %s%s: %s%s\n",
-                  fd.getName(),
-                  argsString(GraphQLFieldDefinition.class, fd.getArguments()),
-                  typeString(fd.getType()),
-                  directivesString(GraphQLFieldDefinition.class, fieldDirectives));
+                      "  %s%s: %s%s",
+                      fd.getName(),
+                      argsString(GraphQLFieldDefinition.class, fd.getArguments()),
+                      typeString(fd.getType()),
+                      directivesString(GraphQLFieldDefinition.class, fieldDirectives))
+                  .append("\n");
             });
     out.append("}");
   }
@@ -569,11 +574,9 @@ public class SchemaPrinter {
     if (!options.getIncludeSchemaElement().test(directive)) {
       return "";
     }
-    if (!options.getIncludeDirective().test(directive)) {
-      // @deprecated is special - we always print it if something is deprecated
-      if (!isDeprecatedDirective(directive)) {
-        return "";
-      }
+    // @deprecated is special - we always print it if something is deprecated
+    if (!(options.getIncludeDirective().test(directive) || isDeprecatedDirective(directive))) {
+      return "";
     }
 
     var sb = new StringBuilder();

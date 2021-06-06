@@ -1,0 +1,31 @@
+schema {
+  query: Query
+}
+
+directive @enhance(a: String, b: String, c: String) on FIELD_DEFINITION
+
+"""
+This is a 
+long comment
+"""
+type Query {
+  "Shorter comment"
+  thing(a: String, b: String, c: String): String @enhance(a: "A", b: "B", c: "C")
+}
+
+union Something = A | B | C
+
+"""
+This is an old 
+long comment
+"""
+type A {
+  "Old shorter comment"
+  thing: String
+}
+type B {
+  thing: String
+}
+type C {
+  thing: String
+}

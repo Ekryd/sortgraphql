@@ -13,6 +13,32 @@ abstract class AbstractParentMojo extends AbstractMojo {
 
   final SorterImpl sorter = new SorterImpl();
 
+  /** Name of the file extension for the backup file. */
+  @Parameter(property = "sortgraphql.backupFileExtension", defaultValue = ".bak")
+  protected String backupFileExtension;
+
+  /** Should a backup copy be created for the sorted schema. */
+  @Parameter(property = "sortgraphql.createBackupFile", defaultValue = "true")
+  protected boolean createBackupFile;
+
+  /** Encoding for the files. */
+  @Parameter(property = "sortgraphql.encoding", defaultValue = "UTF-8")
+  protected String encoding;
+
+  /**
+   * Use hash sign for descriptions/comments, instead of string literals (with quote character),
+   * when generating the sorted schema file.
+   */
+  @Parameter(property = "sortgraphql.generateHashDescriptions", defaultValue = "true")
+  protected boolean generateHashDescriptions;
+
+  /**
+   * Generate the 'schema' definition element at the top of the schema, when generating the sorted
+   * schema file.
+   */
+  @Parameter(property = "sortgraphql.generateSchemaDefinition", defaultValue = "false")
+  protected boolean generateSchemaDefinition;
+
   /** Location of the graphql schema file that should be sorted. If multiple, use schemaFiles. */
   @Parameter(
       property = "sortgraphql.schemaFile",
@@ -26,17 +52,9 @@ abstract class AbstractParentMojo extends AbstractMojo {
   @Parameter(property = "sortgraphql.schemaFiles")
   protected List<File> schemaFiles;
 
-  /** Should a backup copy be created for the sorted schema. */
-  @Parameter(property = "sortgraphql.createBackupFile", defaultValue = "true")
-  protected boolean createBackupFile;
-
-  /** Name of the file extension for the backup file. */
-  @Parameter(property = "sortgraphql.backupFileExtension", defaultValue = ".bak")
-  protected String backupFileExtension;
-
-  /** Encoding for the files. */
-  @Parameter(property = "sortgraphql.encoding", defaultValue = "UTF-8")
-  protected String encoding;
+  /** Set this to 'true' to bypass SortGraphQL plugin */
+  @Parameter(property = "sortgraphql.skip", defaultValue = "false")
+  private boolean skip;
 
   /** Skip sorting the types in a union. */
   @Parameter(property = "sortgraphql.skipUnionTypeSorting", defaultValue = "false")
@@ -45,10 +63,6 @@ abstract class AbstractParentMojo extends AbstractMojo {
   /** Skip sorting the arguments for a field in a type. */
   @Parameter(property = "sortgraphql.skipFieldArgumentSorting", defaultValue = "false")
   protected boolean skipFieldArgumentSorting;
-
-  /** Set this to 'true' to bypass SortGraphQL plugin */
-  @Parameter(property = "sortgraphql.skip", defaultValue = "false")
-  private boolean skip;
 
   /**
    * Execute plugin.

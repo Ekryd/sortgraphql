@@ -53,6 +53,16 @@ sortgraphql:sort
       User property: sortgraphql.encoding
       Encoding for the files.
 
+    generateHashDescriptions (Default: true)
+      User property: sortgraphql.generateHashDescriptions
+      Use hash sign for descriptions/comments, instead of string literals (with
+      quote character), when generating the sorted schema file.
+
+    generateSchemaDefinition (Default: false)
+      User property: sortgraphql.generateSchemaDefinition
+      Generate the 'schema' definition element at the top of the schema, when
+      generating the sorted schema file.
+
     schemaFile (Default: src/main/resources/schema.graphqls)
       User property: sortgraphql.schemaFile
       Location of the graphql schema file that should be sorted. If multiple,

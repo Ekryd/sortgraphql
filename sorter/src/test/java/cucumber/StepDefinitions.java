@@ -21,7 +21,7 @@ import static org.mockito.Mockito.mock;
 
 /** Step definitions for cucumber tests */
 public class StepDefinitions {
-  private final PluginParameters.Builder paramBuilder = PluginParameters.builder();
+  private final PluginParameters.Builder paramBuilder = PluginParameters.builder().setGenerationOptions(false, false, true);
   private final SortingLogger log = mock(SortingLogger.class);
   private List<String> unsortedSchemas;
   private PluginParameters pluginParameters;

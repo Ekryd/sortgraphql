@@ -8,10 +8,13 @@ directive @resolve(graph: String!) on FIELD_DEFINITION
 directive @stream on FIELD
 directive @transform(from: String!) on FIELD
 
+#This is a 
+#long comment
 type Query {
   me: User @resolve(graph: "accounts")
   myVehicle: Vehicle @resolve(graph: "product")
   topAds(first: Int = 5): [Advertisement] @resolve(graph: "advertisement")
+  #Shorter comment
   topProducts(first: Int = 5): [Product] @resolve(graph: "product")
   users(filter: UserFilter): [User] @resolve(graph: "accounts")
 }
@@ -34,11 +37,14 @@ input UserNameMatcher {
   startsWith: String
 }
 
+#This is an old 
+#long comment
 type Advertisement
 @key(fields: "{id}", graph: "advertisement")
 @owner(graph: "advertisement")
 {
   body: String
+  #Old shorter comment
   id: ID!
   reviews: ReviewPage
   title: String

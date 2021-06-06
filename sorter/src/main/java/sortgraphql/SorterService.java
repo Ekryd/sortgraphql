@@ -34,6 +34,7 @@ public class SorterService {
   private boolean skipFieldArgumentSorting;
   private boolean generateSchemaDefinition;
   private boolean generateAllDirectiveDefinitions;
+  private boolean descriptionsAsHashComments;
 
   public void setup(SortingLogger log, PluginParameters pluginParameters) {
     this.log = log;
@@ -43,6 +44,7 @@ public class SorterService {
     this.skipFieldArgumentSorting = pluginParameters.skipFieldArgumentSorting;
     this.generateSchemaDefinition = pluginParameters.generateSchemaDefinition;
     this.generateAllDirectiveDefinitions = pluginParameters.generateAllDirectiveDefinitions;
+    this.descriptionsAsHashComments = pluginParameters.descriptionsAsHashComments;
 
     fileUtil.setup(pluginParameters);
   }
@@ -70,7 +72,6 @@ public class SorterService {
     try {
       return new SchemaGenerator().makeExecutableSchema(registry, runtimeWiring);
     } catch (SchemaProblem schemaProblem) {
-      schemaProblem.printStackTrace();
       throw new FailureException(
           String.format(
               "Cannot process schema from filename '%s', %s",
@@ -94,7 +95,7 @@ public class SorterService {
         OptionsBuilder.defaultOptions()
             .setIncludeDirectiveDefinitions(generateAllDirectiveDefinitions)
             .setIncludeDefinedDirectiveDefinitions(true)
-            .setDescriptionsAsHashComments(true)
+            .setDescriptionsAsHashComments(descriptionsAsHashComments)
             .setIncludeSchemaDefinition(generateSchemaDefinition);
 
     if (skipUnionTypeSorting) {

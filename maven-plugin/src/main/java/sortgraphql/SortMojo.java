@@ -21,6 +21,7 @@ public class SortMojo extends AbstractParentMojo {
                       .setBackup(createBackupFile, backupFileExtension)
                       .setEncoding(encoding)
                       .setSorting(skipUnionTypeSorting, skipFieldArgumentSorting)
+                      .setGenerationOptions(generateSchemaDefinition, false, generateHashDescriptions)
                       .build();
 
               sorter.setup(new MavenLogger(getLog()), pluginParameters);

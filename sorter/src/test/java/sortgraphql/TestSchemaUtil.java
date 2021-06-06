@@ -29,17 +29,19 @@ public class TestSchemaUtil {
     originalSchemaFile = new File("src/test/resources/" + schemaFileName);
     FileUtils.copyFile(originalSchemaFile, testSchemaFile);
 
-    pluginParameterBuilder = PluginParameters.builder()
-        .setSchemaFile(testSchemaFile, null)
-        .setEncoding("UTF-8")
-        .setBackup(true, backupFileExtension);
+    pluginParameterBuilder =
+        PluginParameters.builder()
+            .setSchemaFile(testSchemaFile, null)
+            .setEncoding("UTF-8")
+            .setBackup(true, backupFileExtension)
+            .setGenerationOptions(false, false, true);
 
     sorter = new SorterImpl();
     backupSchemaFile = new File(testSchemaFile.getAbsolutePath() + backupFileExtension);
   }
 
   public void sortSchemas() {
-    sorter.setup(log, pluginParameterBuilder            .build());
+    sorter.setup(log, pluginParameterBuilder.build());
     sorter.sortSchemas();
   }
 

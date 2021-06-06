@@ -65,7 +65,7 @@ class SorterImplTest {
   void includeSchemaShouldIncludeSchemaDefinitionAtTop() throws IOException {
     var util = new TestSchemaUtil("cucumber/basic_products.graphqls", ".test_bak");
 
-    util.getPluginParameterBuilder().setGenerationOptions(true, false);
+    util.getPluginParameterBuilder().setGenerationOptions(true, false, true);
     util.sortSchemas();
 
     var expectedSchemaContent =
@@ -78,7 +78,7 @@ class SorterImplTest {
   void includeAllDirectivesShouldIncludeDirectivesAtTop() throws IOException {
     var util = new TestSchemaUtil("cucumber/basic_products.graphqls", ".test_bak");
 
-    util.getPluginParameterBuilder().setGenerationOptions(false, true);
+    util.getPluginParameterBuilder().setGenerationOptions(false, true, true);
     util.sortSchemas();
 
     var expectedSchemaContent =
@@ -118,7 +118,7 @@ class SorterImplTest {
         endsWith(
             ".graphqls', Invalid Syntax : There are more tokens in the query that have not been consumed offending token 'topProducts' at line 3 column 5"));
   }
-  
+
   @Test
   void incompleteSchemaShouldThrowComprehensiveException() throws IOException {
     var util = new TestSchemaUtil("incomplete_schema.graphqls", ".test_bak");
@@ -130,5 +130,18 @@ class SorterImplTest {
         thrown.getMessage(),
         endsWith(
             ".graphqls', errors=[The field type 'Product' is not present when resolving type 'Query' [@2:1], 'topProducts' [@3:5] tried to use an undeclared directive 'resolve', 'Advertisement' [@7:1] tried to use an undeclared directive 'owner', 'Advertisement' [@7:1] tried to use an undeclared directive 'key']"));
+  }
+  
+  @Test
+  void nonHashCommentsShouldTransformComments() throws IOException {
+    var util = new TestSchemaUtil("cucumber/wolfMain.graphqls", ".test_bak");
+
+    util.getPluginParameterBuilder().setGenerationOptions(false, false, false);
+    util.sortSchemas();
+
+    var expectedSchemaContent =
+        util.getExpectedSchemaContent("wolfMain_comments_expected.graphqls");
+
+    assertThat(util.getTestSchemaContent(), is(expectedSchemaContent));
   }
 }

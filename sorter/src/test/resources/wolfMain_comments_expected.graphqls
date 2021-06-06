@@ -1,27 +1,31 @@
 directive @supernatural(scary: Boolean = true) on FIELD_DEFINITION
 
 type Query {
-  # Number of days
-  # before a person turns to werewolf
+  """
+   Number of days
+   before a person turns to werewolf
+  """
   daysToTurn: Int
-  #Make werewolf
+  "Make werewolf"
   fullmoon(moonPhase: MoonRequest): Werewolf @supernatural
-  # Return person
+  " Return person"
   me: Person
 }
 
-# The sound file of a howl
+" The sound file of a howl"
 scalar Howl
 
 interface Animal {
   doesHowl: Boolean
 }
 
-#Contains traits of both
+"Contains traits of both"
 union Werewolf = Person | Wolf
 
-#This type should really
-#contain the person
+"""
+This type should really
+contain the person
+"""
 input MoonRequest {
   full: Boolean
 }
