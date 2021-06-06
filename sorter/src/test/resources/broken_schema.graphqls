@@ -1,0 +1,11 @@
+
+type Query 
+    topProducts(first: Int = 5): [Product] @resolve(graph: "product")
+    me: User @resolve(graph: "accounts")
+    users(filter: UserFilter): [User] @resolve(graph: "accounts")
+    myVehicle: Vehicle @resolve(graph: "product")
+    topAds(first: Int = 5): [Advertisement] @resolve(graph: "advertisement")
+}
+
+
+type 

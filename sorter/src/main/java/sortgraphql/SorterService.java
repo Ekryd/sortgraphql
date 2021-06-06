@@ -4,6 +4,7 @@ import graphql.language.AbstractDescribedNode;
 import graphql.schema.*;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.TypeDefinitionRegistry;
+import graphql.schema.idl.errors.SchemaProblem;
 import sortgraphql.exception.FailureException;
 import sortgraphql.logger.SortingLogger;
 import sortgraphql.parameter.PluginParameters;
@@ -17,6 +18,8 @@ import java.io.File;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.joining;
 
 /** Contain the concrete methods to sort the schema */
 public class SorterService {
@@ -62,7 +65,15 @@ public class SorterService {
 
     var runtimeWiring = wiringFactory.createFakeRuntime(registry);
 
-    return new SchemaGenerator().makeExecutableSchema(registry, runtimeWiring);
+    try {
+      return new SchemaGenerator().makeExecutableSchema(registry, runtimeWiring);
+    } catch (SchemaProblem schemaProblem) {
+      throw new FailureException(
+          String.format(
+              "Cannot process schema from filename '%s', %s",
+              fileNames.stream().map(File::toString).collect(joining(", ")),
+              schemaProblem.getMessage()));
+    }
   }
 
   public String sortSchema(GraphQLSchema graphQLSchema, String schemaFileName) {

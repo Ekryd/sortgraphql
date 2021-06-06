@@ -3,9 +3,7 @@ package sortgraphql.sort;
 import graphql.parser.InvalidSyntaxException;
 import graphql.parser.Parser;
 import graphql.schema.idl.TypeDefinitionRegistry;
-import graphql.schema.idl.errors.SchemaProblem;
-
-import java.util.Collections;
+import sortgraphql.exception.FailureException;
 
 public class SchemaParser {
   public TypeDefinitionRegistry parse(String schemaContent, String sourceName) {
@@ -16,7 +14,10 @@ public class SchemaParser {
 
       return schemaParser.buildRegistry(document);
     } catch (InvalidSyntaxException e) {
-      throw new SchemaProblem(Collections.singletonList(e.toInvalidSyntaxError()));
+      throw new FailureException(
+          String.format(
+              "Cannot parse schema '%s', %s",
+              sourceName, e.getMessage()));
     }
   }
 }

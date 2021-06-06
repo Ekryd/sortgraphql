@@ -1,0 +1,15 @@
+
+type Query {
+    topProducts(first: Int = 5): [Product] @resolve(graph: "product")
+}
+
+
+type Advertisement
+@owner(graph: "advertisement")
+@key(fields: "{id}", graph: "advertisement")
+{
+    id: ID!
+    title: String
+    body: String
+}
+
