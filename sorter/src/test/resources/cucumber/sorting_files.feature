@@ -25,3 +25,8 @@ Feature: Sorting GraphQL Schema files
       | wolfMain.graphqls |
       | wolfAdd.graphqls  |
     Then sorted schema "wolfAdd.graphqls" file "wolfAdd_expected.graphqls"
+
+  Scenario: schema without query type
+    When unsorted schema file "federated_service_no_query.graphqls"
+    Then sorted schema file "federated_service_no_query_expected.graphqls"
+    

@@ -1,6 +1,6 @@
 package sortgraphql;
 
-import graphql.language.AbstractDescribedNode;
+import graphql.language.*;
 import graphql.schema.*;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.TypeDefinitionRegistry;
@@ -63,16 +63,29 @@ public class SorterService {
         schemaContent ->
             registry.merge(schemaParser.parse(schemaContent, nameIterator.next().getName())));
 
+    addArtificialQueryTypeIfMissing(registry);
+
     var runtimeWiring = wiringFactory.createFakeRuntime(registry);
 
     try {
       return new SchemaGenerator().makeExecutableSchema(registry, runtimeWiring);
     } catch (SchemaProblem schemaProblem) {
+      schemaProblem.printStackTrace();
       throw new FailureException(
           String.format(
               "Cannot process schema from filename '%s', %s",
               fileNames.stream().map(File::toString).collect(joining(", ")),
               schemaProblem.getMessage()));
+    }
+  }
+
+  private void addArtificialQueryTypeIfMissing(TypeDefinitionRegistry registry) {
+    var queryType = registry.getType("Query");
+    if (queryType.isEmpty()) {
+      registry.add(ObjectTypeDefinition.newObjectTypeDefinition().name("Query")
+          .sourceLocation(new SourceLocation(0,0, "internal_artificial_type"))
+          .fieldDefinitions(List.of(new FieldDefinition("internal_artificial_field", new TypeName("Int"))))
+          .build());
     }
   }
 

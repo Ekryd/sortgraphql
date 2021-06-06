@@ -3,6 +3,7 @@ directive @supernatural(scary: Boolean = true) on FIELD_DEFINITION
 type Query {
     me: Person
     fullmoon(moonPhase: MoonRequest): Werewolf    @supernatural(scary: true)
+    daysToTurn: Int
 }
 
 input MoonRequest {
