@@ -1,0 +1,17 @@
+schema {
+  query: B_MyQuery
+  mutation: C_MyMutation
+  subscription: A_MySubscription
+}
+
+type A_MySubscription {
+ number: Int
+}
+
+type C_MyMutation {
+   number: Int
+}
+
+type B_MyQuery {
+    number: Int
+}

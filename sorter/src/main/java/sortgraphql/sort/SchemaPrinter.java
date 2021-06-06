@@ -64,17 +64,17 @@ public class SchemaPrinter {
     typesAsList =
         removeMatchingItems(
             typesAsList,
-            matchesName("Query"),
+            matchesTypeName(schema.getQueryType()),
             type -> printObject(out, (GraphQLObjectType) type, visibility));
     typesAsList =
         removeMatchingItems(
             typesAsList,
-            matchesName("Mutation"),
+            matchesTypeName(schema.getMutationType()),
             type -> printObject(out, (GraphQLObjectType) type, visibility));
     typesAsList =
         removeMatchingItems(
             typesAsList,
-            matchesName("Subscription"),
+            matchesTypeName(schema.getSubscriptionType()),
             type -> printObject(out, (GraphQLObjectType) type, visibility));
 
     typesAsList =
@@ -400,8 +400,12 @@ public class SchemaPrinter {
         clazz.isAssignableFrom(type.getClass()) && options.getIncludeSchemaElement().test(type);
   }
 
-  private Predicate<GraphQLNamedType> matchesName(String query) {
-    return type -> type.getName().equals(query) && options.getIncludeSchemaElement().test(type);
+  private Predicate<GraphQLNamedType> matchesTypeName(GraphQLObjectType namedType) {
+    if (namedType == null) {
+      return testType -> false;
+    }
+    var name = namedType.getName();
+    return testType -> testType.getName().equals(name) && options.getIncludeSchemaElement().test(testType);
   }
 
   private <T> List<T> removeMatchingItems(

@@ -30,3 +30,7 @@ Feature: Sorting GraphQL Schema files
     When unsorted schema file "federated_service_no_query.graphqls"
     Then sorted schema file "federated_service_no_query_expected.graphqls"
     
+  Scenario: force schema definition output
+    When unsorted schema file "force_schema_output.graphqls"
+    Then sorted schema file "force_schema_output_expected.graphqls"
+    
