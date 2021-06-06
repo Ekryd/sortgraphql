@@ -17,7 +17,7 @@ class SorterImplTest {
   void realSortShouldCreateSortedFileAndBackupFile() throws IOException {
     var util = new TestSchemaUtil("cucumber/basic_products.graphqls", ".test_bak");
 
-    util.getSorter().sortSchemas();
+    util.sortSchemas();
 
     var expectedSchemaContent =
         util.getExpectedSchemaContent("cucumber/basic_products_expected.graphqls");
@@ -42,7 +42,7 @@ class SorterImplTest {
   void alreadySortedFileSortShouldJustWriteToLog() throws IOException {
     var util = new TestSchemaUtil("cucumber/basic_products_expected.graphqls", ".test_bak");
 
-    util.getSorter().sortSchemas();
+    util.sortSchemas();
 
     assertThat(util.getBackupSchemaFile().exists(), is(false));
 
@@ -57,8 +57,35 @@ class SorterImplTest {
     var util = new TestSchemaUtil("cucumber/basic_products.graphqls", "");
 
     final FailureException thrown =
-        assertThrows(FailureException.class, () -> util.getSorter().sortSchemas());
+        assertThrows(FailureException.class, util::sortSchemas);
 
     assertThat(thrown.getMessage(), is("Could not create backup file, extension name was empty"));
   }
+
+  @Test
+  void includeSchemaShouldIncludeSchemaDefinitionAtTop() throws IOException {
+    var util = new TestSchemaUtil("cucumber/basic_products.graphqls", ".test_bak");
+
+    util.getPluginParameterBuilder().setGenerationOptions(true, false);
+    util.sortSchemas();
+
+    var expectedSchemaContent =
+        util.getExpectedSchemaContent("cucumber/basic_products_with_schema_expected.graphqls");
+
+    assertThat(util.getTestSchemaContent(), is(expectedSchemaContent));
+  }
+
+  @Test
+  void includeAllDirectivesShouldIncludeDirectivesAtTop() throws IOException {
+    var util = new TestSchemaUtil("cucumber/basic_products.graphqls", ".test_bak");
+
+    util.getPluginParameterBuilder().setGenerationOptions(false, true);
+    util.sortSchemas();
+
+    var expectedSchemaContent =
+        util.getExpectedSchemaContent("cucumber/basic_products_with_all_directives_expected.graphqls");
+
+    assertThat(util.getTestSchemaContent(), is(expectedSchemaContent));
+  }
+
 }

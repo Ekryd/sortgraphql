@@ -7,8 +7,23 @@ input Victim {
     traits: KindType
 }
 
-type Cat implements Animal {
+type Cat implements CuteAnimal, Animal {
     doesHowl: Boolean
     howl: Howl
    traits: KindType 
 }
+
+interface CuteAnimal implements Animal {
+    doesHowl: Boolean
+}
+
+enum wereTypes {
+    WORM @deprecated 
+    WOLF
+    BEAR
+}
+
+type Subscription {
+  monthlyWerewolf: Werewolf  
+}
+

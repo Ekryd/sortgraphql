@@ -19,6 +19,7 @@ public class TestSchemaUtil {
   private final File testSchemaFile;
   private final File originalSchemaFile;
   private final File backupSchemaFile;
+  private final PluginParameters.Builder pluginParameterBuilder;
 
   public TestSchemaUtil(String schemaFileName, String backupFileExtension) throws IOException {
     testSchemaFile = new File("target/testSchema" + System.currentTimeMillis() + ".graphqls");
@@ -28,20 +29,22 @@ public class TestSchemaUtil {
     originalSchemaFile = new File("src/test/resources/" + schemaFileName);
     FileUtils.copyFile(originalSchemaFile, testSchemaFile);
 
-    var pluginParameters =
-        PluginParameters.builder()
-            .setSchemaFile(testSchemaFile, null)
-            .setEncoding("UTF-8")
-            .setBackup(true, backupFileExtension)
-            .build();
+    pluginParameterBuilder = PluginParameters.builder()
+        .setSchemaFile(testSchemaFile, null)
+        .setEncoding("UTF-8")
+        .setBackup(true, backupFileExtension);
 
     sorter = new SorterImpl();
-    sorter.setup(log, pluginParameters);
     backupSchemaFile = new File(testSchemaFile.getAbsolutePath() + backupFileExtension);
   }
 
-  public SorterImpl getSorter() {
-    return sorter;
+  public void sortSchemas() {
+    sorter.setup(log, pluginParameterBuilder            .build());
+    sorter.sortSchemas();
+  }
+
+  public PluginParameters.Builder getPluginParameterBuilder() {
+    return pluginParameterBuilder;
   }
 
   public SortingLogger getLog() {

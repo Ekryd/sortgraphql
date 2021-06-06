@@ -29,6 +29,8 @@ public class SorterService {
   private String backupFileExtension;
   private boolean skipUnionTypeSorting;
   private boolean skipFieldArgumentSorting;
+  private boolean generateSchemaDefinition;
+  private boolean generateAllDirectiveDefinitions;
 
   public void setup(SortingLogger log, PluginParameters pluginParameters) {
     this.log = log;
@@ -36,6 +38,8 @@ public class SorterService {
     this.backupFileExtension = pluginParameters.backupFileExtension;
     this.skipUnionTypeSorting = pluginParameters.skipUnionTypeSorting;
     this.skipFieldArgumentSorting = pluginParameters.skipFieldArgumentSorting;
+    this.generateSchemaDefinition = pluginParameters.generateSchemaDefinition;
+    this.generateAllDirectiveDefinitions = pluginParameters.generateAllDirectiveDefinitions;
 
     fileUtil.setup(pluginParameters);
   }
@@ -64,9 +68,10 @@ public class SorterService {
   public String sortSchema(GraphQLSchema graphQLSchema, String schemaFileName) {
     var options =
         OptionsBuilder.defaultOptions()
-            .setIncludeDirectiveDefinitions(false)
+            .setIncludeDirectiveDefinitions(generateAllDirectiveDefinitions)
             .setIncludeDefinedDirectiveDefinitions(true)
-            .setDescriptionsAsHashComments(true);
+            .setDescriptionsAsHashComments(true)
+            .setIncludeSchemaDefinition(generateSchemaDefinition);
 
     if (skipUnionTypeSorting) {
       var environment =

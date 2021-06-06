@@ -3,12 +3,26 @@ type Mutation {
   cure(moonPhase: MoonRequest): Person @supernatural(scary: false)
 }
 
+type Subscription {
+  monthlyWerewolf: Werewolf
+}
+
+interface CuteAnimal implements Animal {
+  doesHowl: Boolean
+}
+
 input Victim {
   traits: KindType
 }
 
-type Cat implements Animal {
+type Cat implements Animal & CuteAnimal {
   doesHowl: Boolean
   howl: Howl
   traits: KindType
+}
+
+enum wereTypes {
+  BEAR
+  WOLF
+  WORM @deprecated
 }

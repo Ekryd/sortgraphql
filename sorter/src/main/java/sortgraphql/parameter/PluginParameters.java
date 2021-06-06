@@ -13,6 +13,8 @@ public class PluginParameters {
   public final String encoding;
   public final boolean skipUnionTypeSorting;
   public final boolean skipFieldArgumentSorting;
+  public final boolean generateSchemaDefinition;
+  public final boolean generateAllDirectiveDefinitions;
 
   public PluginParameters(
       List<File> schemaFiles,
@@ -20,13 +22,15 @@ public class PluginParameters {
       String backupFileExtension,
       String encoding,
       boolean skipUnionTypeSorting,
-      boolean skipFieldArgumentSorting) {
+      boolean skipFieldArgumentSorting, boolean generateSchemaDefinition, boolean generateAllDirectiveDefinitions) {
     this.schemaFiles = schemaFiles;
     this.createBackupFile = createBackupFile;
     this.backupFileExtension = backupFileExtension;
     this.encoding = encoding;
     this.skipUnionTypeSorting = skipUnionTypeSorting;
     this.skipFieldArgumentSorting = skipFieldArgumentSorting;
+    this.generateSchemaDefinition = generateSchemaDefinition;
+    this.generateAllDirectiveDefinitions = generateAllDirectiveDefinitions;
   }
 
   public static Builder builder() {
@@ -41,6 +45,8 @@ public class PluginParameters {
     private String encoding;
     private boolean skipUnionTypeSorting;
     private boolean skipFieldArgumentSorting;
+    private boolean generateSchemaDefinition;
+    private boolean generateAllDirectiveDefinitions;
 
     private Builder() {}
 
@@ -71,6 +77,12 @@ public class PluginParameters {
       this.skipFieldArgumentSorting = skipFieldArgumentSorting;
       return this;
     }
+    
+    public Builder setGenerationOptions(boolean generateSchemaDefinition, boolean generateAllDirectiveDefinitions) {
+      this.generateSchemaDefinition = generateSchemaDefinition;
+      this.generateAllDirectiveDefinitions = generateAllDirectiveDefinitions;
+      return this;
+    }
 
     /** Build the PluginParameters instance */
     public PluginParameters build() {
@@ -80,7 +92,9 @@ public class PluginParameters {
           backupFileExtension,
           encoding,
           skipUnionTypeSorting,
-          skipFieldArgumentSorting);
+          skipFieldArgumentSorting, 
+          generateSchemaDefinition,
+          generateAllDirectiveDefinitions);
     }
   }
 }

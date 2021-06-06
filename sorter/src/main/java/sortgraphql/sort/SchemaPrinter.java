@@ -124,9 +124,6 @@ public class SchemaPrinter {
 
   private <T> List<T> removeMatchingItems(
       List<T> list, Predicate<T> filter, Consumer<T> removedItemsFn) {
-    if (list.isEmpty()) {
-      return list;
-    }
     List<T> returnValue = new ArrayList<>();
     for (var item : list) {
       if (filter.test(item)) {
@@ -421,7 +418,10 @@ public class SchemaPrinter {
     }
 
     if (needsSchemaPrinted) {
-      out.format("schema %s{\n", directivesString(GraphQLSchemaElement.class, schemaDirectives));
+      out.format("schema%s{\n", 
+          schemaDirectives.isEmpty()
+              ? " "
+              : "\n" + directivesString(GraphQLSchemaElement.class, schemaDirectives));
       if (queryType != null) {
         out.format("  query: %s\n", queryType.getName());
       }
@@ -556,7 +556,7 @@ public class SchemaPrinter {
     for (var i = 0; i < directives.size(); i++) {
       var directive = directives.get(i);
       sb.append(directiveString(directive));
-      if (parent == GraphQLObjectType.class) {
+      if (parent == GraphQLObjectType.class || parent == GraphQLSchemaElement.class) {
         sb.append("\n");
       } else if (i < directives.size() - 1) {
         sb.append(" ");

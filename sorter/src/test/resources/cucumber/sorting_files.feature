@@ -1,4 +1,4 @@
-Feature: Sorting GraphQL Schemas
+Feature: Sorting GraphQL Schema files
 
   Scenario: basic query schema files
     When unsorted schema file "basic_products.graphqls"

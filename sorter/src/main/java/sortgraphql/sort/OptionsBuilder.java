@@ -73,11 +73,7 @@ public class OptionsBuilder {
    * This flag controls whether schema printer will include non-standard directive definitions at
    * the top of the schema, but does not remove them from the field or type usage.
    *
-   * <p>In some schema definitions, like Apollo Federation, the schema should be printed without the
-   * directive definitions. This simplified schema is returned by a GraphQL query to other services,
-   * in a format that is different that the introspection query.
-   *
-   * <p>On by default.
+   * <p>Off by default.
    */
   public OptionsBuilder setIncludeDefinedDirectiveDefinitions(
       boolean includeDefinedDirectiveDefinitions) {

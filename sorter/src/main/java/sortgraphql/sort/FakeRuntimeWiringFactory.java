@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 /** */
 public class FakeRuntimeWiringFactory {
-  private static final Coercing<Object, Object> emptyCoercing =
+  static final Coercing<Object, Object> emptyCoercing =
       new Coercing<>() {
         @Override
         public Object serialize(Object dataFetcherResult) {

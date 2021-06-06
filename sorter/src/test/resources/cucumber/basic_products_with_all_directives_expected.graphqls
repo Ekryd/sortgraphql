@@ -1,0 +1,135 @@
+directive @composedGraph(version: Int!) on SCHEMA
+#Marks the field or enum value as deprecated
+directive @deprecated(
+    #The reason for the deprecation
+    reason: String = "No longer supported"
+  ) on FIELD_DEFINITION | ENUM_VALUE
+directive @graph(name: String!, url: String!) repeatable on SCHEMA
+#Directs the executor to include this field or fragment only when the `if` argument is true
+directive @include(
+    #Included when true.
+    if: Boolean!
+  ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+directive @key(fields: String!, graph: String!) repeatable on OBJECT
+directive @owner(graph: String!) on OBJECT
+directive @provides(fields: String!) on FIELD_DEFINITION
+directive @requires(fields: String!) on FIELD_DEFINITION
+directive @resolve(graph: String!) on FIELD_DEFINITION
+#Directs the executor to skip this field or fragment when the `if`'argument is true.
+directive @skip(
+    #Skipped when true.
+    if: Boolean!
+  ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+#Exposes a URL that specifies the behaviour of this scalar.
+directive @specifiedBy(
+    #The URL that specifies the behaviour of this scalar.
+    url: String!
+  ) on SCALAR
+directive @stream on FIELD
+directive @transform(from: String!) on FIELD
+
+type Query {
+  me: User @resolve(graph: "accounts")
+  myVehicle: Vehicle @resolve(graph: "product")
+  topAds(first: Int = 5): [Advertisement] @resolve(graph: "advertisement")
+  topProducts(first: Int = 5): [Product] @resolve(graph: "product")
+  users(filter: UserFilter): [User] @resolve(graph: "accounts")
+}
+
+interface Vehicle {
+  id: ID!
+  retailPrice: String
+}
+
+union Thing = Car | Product
+
+input UserFilter {
+  nameMatches: UserNameMatcher
+  nrResults: Int = 5
+}
+
+input UserNameMatcher {
+  contains: String
+  length: Int
+  startsWith: String
+}
+
+type Advertisement
+@key(fields: "{id}", graph: "advertisement")
+@owner(graph: "advertisement")
+{
+  body: String
+  id: ID!
+  reviews: ReviewPage
+  title: String
+}
+
+type Car implements Vehicle
+@key(fields: "{id}", graph: "product")
+@owner(graph: "product")
+{
+  id: ID!
+  price: String
+  retailPrice: String
+}
+
+type Product
+@key(fields: "{upc}", graph: "product")
+@key(fields: "{upc}", graph: "inventory")
+@key(fields: "{upc}", graph: "reviews")
+@owner(graph: "product")
+{
+  inStock: Boolean @resolve(graph: "inventory")
+  name: String!
+  price: Int
+  relatedReviews: [Review] @requires(fields: "{ similarProducts { upc } }") @resolve(graph: "reviews")
+  reviews: [Review] @resolve(graph: "reviews")
+  shippingEstimate: Int @requires(fields: "{price weight}") @resolve(graph: "inventory")
+  similarProducts: [Product]
+  upc: String!
+  weight: Int
+}
+
+type Review
+@key(fields: "{id}", graph: "reviews")
+@key(fields: "{id}", graph: "advertisement")
+@owner(graph: "reviews")
+{
+  author: User @provides(fields: "{username}")
+  body: String
+  id: ID!
+  product: Product
+}
+
+type ReviewPage
+@key(fields: "{items}", graph: "reviews")
+@key(fields: "{items}", graph: "advertisement")
+@owner(graph: "reviews")
+{
+  cursor: String
+  items: [Review]
+  totalReviews: Int
+}
+
+type User
+@key(fields: "{id}", graph: "accounts")
+@key(fields: "{id}", graph: "reviews")
+@key(fields: "{id}", graph: "product")
+@owner(graph: "accounts")
+{
+  id: ID!
+  name: String
+  reviews: [Review] @resolve(graph: "reviews")
+  unionThing: Thing @resolve(graph: "product")
+  username(uppercase: Boolean = false): String
+  vehicle: Vehicle @resolve(graph: "product")
+}
+
+type Van implements Vehicle
+@key(fields: "{id}", graph: "product")
+@owner(graph: "product")
+{
+  id: ID!
+  price: String
+  retailPrice: String
+}
