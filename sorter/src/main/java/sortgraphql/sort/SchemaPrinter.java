@@ -718,19 +718,19 @@ public class SchemaPrinter {
   }
 
   private void printMultiLineHashDescription(PrintWriter out, String prefix, List<String> lines) {
-    lines.forEach(l -> out.printf("%s#%s\n", prefix, l));
+    lines.forEach(l -> out.printf("%s#%s", prefix, l).append("\n"));
   }
 
   private void printMultiLineDescription(PrintWriter out, String prefix, List<String> lines) {
-    out.printf("%s\"\"\"\n", prefix);
-    lines.forEach(l -> out.printf("%s%s\n", prefix, l));
-    out.printf("%s\"\"\"\n", prefix);
+    out.printf("%s\"\"\"", prefix).append("\n");
+    lines.forEach(l -> out.printf("%s%s", prefix, l).append("\n"));
+    out.printf("%s\"\"\"", prefix).append("\n");
   }
 
   private void printSingleLineDescription(PrintWriter out, String prefix, String s) {
     // See: https://github.com/graphql/graphql-spec/issues/148
     var desc = escapeJsonString(s);
-    out.printf("%s\"%s\"\n", prefix, desc);
+    out.printf("%s\"%s\"", prefix, desc).append("\n");
   }
 
   private boolean hasDescription(Object descriptionHolder) {
@@ -808,10 +808,8 @@ public class SchemaPrinter {
     // So the other code here is a really defensive way to get the description
     //
     var descriptionText = runtimeDescription;
-    if (isNullOrEmpty(descriptionText)) {
-      if (descriptionAst != null) {
-        descriptionText = descriptionAst.getContent();
-      }
+    if (isNullOrEmpty(descriptionText) && descriptionAst != null) {
+      descriptionText = descriptionAst.getContent();
     }
     return descriptionText;
   }
