@@ -2,6 +2,7 @@ package sortgraphql.sort;
 
 import graphql.Assert;
 import graphql.PublicApi;
+import graphql.execution.ValuesResolver;
 import graphql.language.*;
 import graphql.schema.*;
 import graphql.schema.idl.ScalarInfo;
@@ -297,8 +298,8 @@ public class SchemaPrinter {
               fd -> {
                 printComments(out, fd, "  ");
                 out.format("  %s: %s", fd.getName(), typeString(fd.getType()));
-                var defaultValue = fd.getDefaultValue();
-                if (defaultValue != null) {
+                if (fd.hasSetDefaultValue()) {
+                  var defaultValue = fd.getInputFieldDefaultValue();
                   var astValue = printAst(defaultValue, fd.getType());
                   out.format(" = %s", astValue);
                 }
@@ -457,9 +458,8 @@ public class SchemaPrinter {
     out.append("}");
   }
 
-  private static String printAst(Object value, GraphQLInputType type) {
-    var node = value instanceof Value ? (Value<?>) value : AstValueHelper.astFromValue(value, type);
-    return AstPrinter.printAst(node);
+  private static String printAst(InputValueWithState value, GraphQLInputType type) {
+    return AstPrinter.printAst(ValuesResolver.valueToLiteral(value, type));
   }
 
   private List<GraphQLDirective> getSchemaDirectives(GraphQLSchema schema) {
@@ -509,8 +509,8 @@ public class SchemaPrinter {
           .append(argument.getName())
           .append(": ")
           .append(typeString(argument.getType()));
-      var defaultValue = argument.getDefaultValue();
-      if (defaultValue != null) {
+      if (argument.hasSetDefaultValue()) {
+        var defaultValue = argument.getArgumentDefaultValue();
         sb.append(" = ");
         sb.append(printAst(defaultValue, argument.getType()));
       }
@@ -596,7 +596,7 @@ public class SchemaPrinter {
     var args = directive.getArguments();
     args =
         args.stream()
-            .filter(arg -> arg.getValue() != null && !arg.getValue().equals(arg.getDefaultValue()))
+            .filter(arg -> arg.hasSetValue() && !sameAsDefaultValue(arg))
             .sorted(comparator)
             .collect(toList());
     if (!args.isEmpty()) {
@@ -604,10 +604,10 @@ public class SchemaPrinter {
       for (var i = 0; i < args.size(); i++) {
         var arg = args.get(i);
         String argValue = null;
-        if (arg.getValue() != null) {
-          argValue = printAst(arg.getValue(), arg.getType());
-        } else if (arg.getDefaultValue() != null) {
-          argValue = printAst(arg.getDefaultValue(), arg.getType());
+        if (arg.hasSetValue()) {
+          argValue = printAst(arg.getArgumentValue(), arg.getType());
+        } else if (arg.hasSetDefaultValue()) {
+          argValue = printAst(arg.getArgumentDefaultValue(), arg.getType());
         }
         if (!isNullOrEmpty(argValue)) {
           sb.append(arg.getName());
@@ -621,6 +621,16 @@ public class SchemaPrinter {
       sb.append(")");
     }
     return sb.toString();
+  }
+
+  private boolean sameAsDefaultValue(GraphQLArgument arg) {
+    if (arg.hasSetValue() && arg.hasSetDefaultValue()) {
+      var argValue = arg.getArgumentValue().getValue();
+      var defaultValue = arg.getArgumentDefaultValue().getValue();
+      //noinspection ConstantConditions
+      return argValue.toString().equals(defaultValue.toString());
+    }
+    return false;
   }
 
   private boolean isDeprecatedDirective(GraphQLDirective directive) {
