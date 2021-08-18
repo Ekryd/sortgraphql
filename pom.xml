@@ -19,7 +19,7 @@
   <properties>
     <cucumber.version>6.11.0</cucumber.version>
     <java.version>11</java.version>
-    <junit.jupiter.version>5.8.0-M1</junit.jupiter.version>
+    <junit.jupiter.version>5.8.0-RC1</junit.jupiter.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <mockito.version>3.11.2</mockito.version>
