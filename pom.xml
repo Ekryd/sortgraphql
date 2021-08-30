@@ -24,7 +24,7 @@
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <mockito.version>3.12.4</mockito.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <slf4j.version>2.0.0-alpha4</slf4j.version>
+    <slf4j.version>2.0.0-alpha5</slf4j.version>
   </properties>
 
   <dependencyManagement>
