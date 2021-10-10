@@ -1,0 +1,11 @@
+scalar _FieldSet
+directive @key(fields: _FieldSet!) repeatable on OBJECT | INTERFACE
+
+  type Query {
+    me: User
+  }
+  type User @key(fields: "id") {
+    id: ID!
+    name: String
+    username: String
+  }

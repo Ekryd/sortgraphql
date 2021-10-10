@@ -63,6 +63,12 @@ sortgraphql:sort
       Generate the 'schema' definition element at the top of the schema, when
       generating the sorted schema file.
 
+    individualSchemas (Default: false)
+      User property: sortgraphql.individualSchemas
+      By default, if multiple schema files are specified in schema files, then
+      those schemas will be merged together during validation. This flag
+      specifies that each schema should be validated individually.
+
     schemaFile (Default: src/main/resources/schema.graphqls)
       User property: sortgraphql.schemaFile
       Location of the graphql schema file that should be sorted. If multiple,

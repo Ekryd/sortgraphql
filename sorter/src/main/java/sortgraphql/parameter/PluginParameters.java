@@ -16,6 +16,7 @@ public class PluginParameters {
   public final boolean generateSchemaDefinition;
   public final boolean generateAllDirectiveDefinitions;
   public final boolean descriptionsAsHashComments;
+  public final boolean individualSchemas;
 
   public PluginParameters(
       List<File> schemaFiles,
@@ -26,7 +27,8 @@ public class PluginParameters {
       boolean skipFieldArgumentSorting,
       boolean generateSchemaDefinition,
       boolean generateAllDirectiveDefinitions,
-      boolean descriptionsAsHashComments) {
+      boolean descriptionsAsHashComments,
+      boolean individualSchemas) {
     this.schemaFiles = schemaFiles;
     this.createBackupFile = createBackupFile;
     this.backupFileExtension = backupFileExtension;
@@ -36,6 +38,7 @@ public class PluginParameters {
     this.generateSchemaDefinition = generateSchemaDefinition;
     this.generateAllDirectiveDefinitions = generateAllDirectiveDefinitions;
     this.descriptionsAsHashComments = descriptionsAsHashComments;
+    this.individualSchemas = individualSchemas;
   }
 
   public static Builder builder() {
@@ -53,6 +56,7 @@ public class PluginParameters {
     private boolean generateSchemaDefinition;
     private boolean generateAllDirectiveDefinitions;
     private boolean descriptionsAsHashComments;
+    private boolean individualSchemas;
 
     private Builder() {}
 
@@ -74,6 +78,11 @@ public class PluginParameters {
     /** Sets which encoding should be used throughout the plugin */
     public Builder setEncoding(final String encoding) {
       this.encoding = encoding;
+      return this;
+    }
+
+    public Builder setIndividualSchemas(boolean individualSchemas) {
+      this.individualSchemas = individualSchemas;
       return this;
     }
 
@@ -105,7 +114,8 @@ public class PluginParameters {
           skipFieldArgumentSorting,
           generateSchemaDefinition,
           generateAllDirectiveDefinitions,
-          descriptionsAsHashComments);
+          descriptionsAsHashComments,
+          individualSchemas);
     }
   }
 }

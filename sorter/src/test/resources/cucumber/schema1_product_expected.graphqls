@@ -1,0 +1,16 @@
+directive @key(fields: _FieldSet!) repeatable on OBJECT | INTERFACE
+
+type Query {
+  topProducts(first: Int = 5): [Product]
+}
+
+scalar _FieldSet
+
+type Product
+@key(fields: "upc")
+{
+  name: String
+  price: Int
+  upc: String!
+  weight: Int
+}

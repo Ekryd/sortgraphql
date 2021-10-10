@@ -39,6 +39,14 @@ abstract class AbstractParentMojo extends AbstractMojo {
   @Parameter(property = "sortgraphql.generateSchemaDefinition", defaultValue = "false")
   protected boolean generateSchemaDefinition;
 
+  /**
+   * By default, if multiple schema files are specified in schema files, then those schemas will be
+   * merged together during validation. This flag specifies that each schema should be validated
+   * individually.
+   */
+  @Parameter(property = "sortgraphql.individualSchemas", defaultValue = "false")
+  protected boolean individualSchemas;
+
   /** Location of the graphql schema file that should be sorted. If multiple, use schemaFiles. */
   @Parameter(
       property = "sortgraphql.schemaFile",

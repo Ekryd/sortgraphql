@@ -45,6 +45,11 @@ public class StepDefinitions {
     paramBuilder.setSorting(paramBuilder.build().skipUnionTypeSorting, flag);
   }
 
+  @Given("sort individual schemas is {booleanValue}")
+  public void sortIndividualSchemasIsTrue(boolean flag) {
+    paramBuilder.setIndividualSchemas(flag);
+  }
+
   @Given("schema content")
   public void schemaContent(String content) {
     storeSchemaFile("filename", content);

@@ -1,0 +1,35 @@
+directive @supernatural(scary: Boolean = true) on FIELD_DEFINITION
+scalar _FieldSet
+directive @key(fields: _FieldSet!) repeatable on OBJECT | INTERFACE
+
+type Query {
+    me: Person
+    fullmoon(moonPhase: MoonRequest): Werewolf    @supernatural(scary: true)
+}
+
+input MoonRequest {
+    full: Boolean
+}
+
+scalar Howl
+
+union Werewolf = Person | Wolf
+
+interface Animal {
+    doesHowl: Boolean
+}
+
+type Wolf @key(fields: "tag") {
+    doesHowl: Boolean
+    howl: Howl
+  tag: String
+}
+
+type Person @key(fields: "name") {
+   traits: KindType
+    name: String
+}
+
+enum KindType {
+    KIND
+}
