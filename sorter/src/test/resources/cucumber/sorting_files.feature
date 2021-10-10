@@ -1,36 +1,38 @@
 Feature: Sorting GraphQL Schema files
 
   Scenario: basic query schema files
-    When unsorted schema file "basic_products.graphqls"
-    Then sorted schema file "basic_products_expected.graphqls"
+    Given schema file "basic_products.graphqls"
+    When sorting
+    Then schema file "basic_products.graphqls" will be "basic_products_expected.graphqls"
 
   Scenario: base federation specification
-    When unsorted schema file "federation.graphqls"
-    Then sorted schema file "federation_expected.graphqls"
+    Given schema file "federation.graphqls"
+    When sorting
+    Then schema file "federation.graphqls" will be "federation_expected.graphqls"
 
   Scenario: sorting multiple files
-    When unsorted schema files
+    Given schema files
       | wolfMain.graphqls |
       | wolfAdd.graphqls  |
-    Then sorted schema "wolfMain.graphqls" file "wolfMain_expected.graphqls"
+    When sorting
+    Then schema file "wolfMain.graphqls" will be "wolfMain_expected.graphqls"
+    Then schema file "wolfAdd.graphqls" will be "wolfAdd_expected.graphqls"
 
   Scenario: sorting multiple files (reverse input order)
-    When unsorted schema files
+    Given schema files
       | wolfAdd.graphqls  |
       | wolfMain.graphqls |
-    Then sorted schema "wolfMain.graphqls" file "wolfMain_expected.graphqls"
+    When sorting
+    Then schema file "wolfMain.graphqls" will be "wolfMain_expected.graphqls"
+    Then schema file "wolfAdd.graphqls" will be "wolfAdd_expected.graphqls"
 
-  Scenario: sorting multiple files (verify addition)
-    When unsorted schema files
-      | wolfMain.graphqls |
-      | wolfAdd.graphqls  |
-    Then sorted schema "wolfAdd.graphqls" file "wolfAdd_expected.graphqls"
+  Scenario: base federation specification
+    Given schema file "federated_service_no_query.graphqls"
+    When sorting
+    Then schema file "federated_service_no_query.graphqls" will be "federated_service_no_query_expected.graphqls"
 
-  Scenario: schema without query type
-    When unsorted schema file "federated_service_no_query.graphqls"
-    Then sorted schema file "federated_service_no_query_expected.graphqls"
-    
-  Scenario: force schema definition output
-    When unsorted schema file "force_schema_output.graphqls"
-    Then sorted schema file "force_schema_output_expected.graphqls"
+  Scenario: base federation specification
+    Given schema file "force_schema_output.graphqls"
+    When sorting
+    Then schema file "force_schema_output.graphqls" will be "force_schema_output_expected.graphqls"
     

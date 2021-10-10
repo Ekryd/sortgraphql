@@ -1,7 +1,7 @@
 Feature: Sorting unions in different ways
   
   Scenario: Unions are sorted by default
-    When unsorted schema content
+    Given schema content
 """
 union Something = B | C | A
 
@@ -19,7 +19,8 @@ type C {
   thing: String
 }
 """
-    Then sorted schema content
+    When sorting
+    Then schema content will be
 """
 type Query {
   thing: String
@@ -43,7 +44,7 @@ type C {
     
   Scenario: Do not sort union types
     Given skip union type sorting is true
-    When unsorted schema content
+    Given schema content
 """
 union Something = B | C | A
 
@@ -61,7 +62,8 @@ type C {
   thing: String
 }
 """
-    Then sorted schema content
+    When sorting
+    Then schema content will be
 """
 type Query {
   thing: String

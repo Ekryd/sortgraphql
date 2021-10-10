@@ -4,27 +4,31 @@ import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import sortgraphql.SorterService;
+import sortgraphql.SorterImpl;
 import sortgraphql.logger.SortingLogger;
 import sortgraphql.parameter.PluginParameters;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
-import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 
 /** Step definitions for cucumber tests */
 public class StepDefinitions {
-  private final PluginParameters.Builder paramBuilder = PluginParameters.builder().setGenerationOptions(false, false, true);
+  private final PluginParameters.Builder paramBuilder =
+      PluginParameters.builder().setGenerationOptions(false, false, true).setEncoding("UTF-8");
   private final SortingLogger log = mock(SortingLogger.class);
-  private List<String> unsortedSchemas;
-  private PluginParameters pluginParameters;
+  private final Map<String, Path> tempFiles = new LinkedHashMap<>();
+  private SorterImpl sorter;
 
   @ParameterType(value = "true|True|TRUE|false|False|FALSE")
   public Boolean booleanValue(String value) {
@@ -41,41 +45,46 @@ public class StepDefinitions {
     paramBuilder.setSorting(paramBuilder.build().skipUnionTypeSorting, flag);
   }
 
-  @When("unsorted schema content")
-  public void unsortedSchemaContent(String unsortedSchemaContent) {
-    pluginParameters = paramBuilder.setSchemaFile(new File("name"), emptyList()).build();
-    this.unsortedSchemas = Collections.singletonList(unsortedSchemaContent);
+  @Given("schema content")
+  public void schemaContent(String content) {
+    storeSchemaFile("filename", content);
   }
 
-  @When("unsorted schema file {string}")
-  public void unsortedSchemaFile(String unsortedSchemaFilename) {
-    pluginParameters =
-        paramBuilder.setSchemaFile(new File("name"), emptyList()).build();
-    this.unsortedSchemas =
-        Collections.singletonList(getContentFromFileName(unsortedSchemaFilename));
+  @Given("schema files")
+  public void schemaFiles(List<String> filenames) {
+    filenames.forEach(this::schemaFile);
   }
 
-  @When("unsorted schema files")
-  public void unsortedSchemaFile(List<String> filenames) {
-    var files = filenames.stream().map(File::new).collect(Collectors.toList());
-    pluginParameters = paramBuilder.setSchemaFile(null, files).build();
-    this.unsortedSchemas =
-        filenames.stream().map(this::getContentFromFileName).collect(Collectors.toList());
+  @Given("schema file {string}")
+  public void schemaFile(String filename) {
+    var contentFromFileName = getContentFromFileName(filename);
+    storeSchemaFile(filename, contentFromFileName);
   }
 
-  @Then("sorted schema content")
-  public void sortedSchemaContent(String expectedSchemaContent) {
-    assertSortedSchema("name", expectedSchemaContent);
+  @When("sorting")
+  public void sorting() {
+    sorter = new SorterImpl();
+
+    sorter.setup(log, paramBuilder.build());
+
+    sorter.sortSchemas();
   }
 
-  @Then("sorted schema file {string}")
-  public void sortedSchemaFile(String expectedSchemaFilename) {
-    assertSortedSchema("name", getContentFromFileName(expectedSchemaFilename));
+  @Then("schema file {string} will be {string}")
+  public void schemaFileWillBe(String filename, String expectedFilenameContent) throws IOException {
+    if (sorter == null) {
+      fail("Missed the sorting step");
+    }
+    var expectedSchemaContent = getContentFromFileName(expectedFilenameContent);
+    assertThat(Files.readString(tempFiles.get(filename)), is(expectedSchemaContent));
   }
 
-  @Then("sorted schema {string} file {string}")
-  public void sortedSchemaFile(String schemaName, String expectedSchemaFilename) {
-    assertSortedSchema(schemaName, getContentFromFileName(expectedSchemaFilename));
+  @Then("schema content will be")
+  public void schemaFileWillBe(String expectedSchemaContent) throws IOException {
+    if (sorter == null) {
+      fail("Missed the sorting step");
+    }
+    assertThat(Files.readString(tempFiles.get("filename")), is(expectedSchemaContent));
   }
 
   private String getContentFromFileName(String filename) {
@@ -90,12 +99,25 @@ public class StepDefinitions {
     }
   }
 
-  private void assertSortedSchema(String schemaName, String expectedSchemaContent) {
-    var sorterService = new SorterService();
-    sorterService.setup(log, pluginParameters);
-    var mergedSchema =
-        sorterService.createMergedSchema(unsortedSchemas, pluginParameters.schemaFiles);
-    var sortedSchema = sorterService.sortSchema(mergedSchema, schemaName);
-    assertThat(sortedSchema, is(expectedSchemaContent));
+  private void storeSchemaFile(String filename, String contentFromFileName) {
+    Path tempFile;
+    try {
+      tempFile = Files.createTempFile(filename, null);
+      if (tempFiles.containsKey(filename)) {
+        fail("Trying to add same file twice to test: " + filename);
+      }
+      tempFiles.put(filename, tempFile);
+      Files.write(tempFile, contentFromFileName.getBytes(StandardCharsets.UTF_8));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    var oldSchemaFiles = paramBuilder.build().schemaFiles;
+    if (oldSchemaFiles == null || oldSchemaFiles.isEmpty()) {
+      paramBuilder.setSchemaFile(tempFile.toFile(), null);
+    } else {
+      var newFiles = new ArrayList<>(oldSchemaFiles);
+      newFiles.add(tempFile.toFile());
+      paramBuilder.setSchemaFile(null, newFiles);
+    }
   }
 }
