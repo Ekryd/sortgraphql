@@ -1,7 +1,7 @@
 Feature: Sorting annotations in different ways
   
   Scenario: Default arguments should not be printed
-    When unsorted schema content
+    Given schema content
 """
 directive @something(name: String = "a default name", title: String) on FIELD_DEFINITION
 
@@ -12,7 +12,8 @@ type Query {
   thing4: String @something(name: "a default name")
 }
 """
-    Then sorted schema content
+    When sorting
+    Then schema content will be
 """
 directive @something(name: String = "a default name", title: String) on FIELD_DEFINITION
 

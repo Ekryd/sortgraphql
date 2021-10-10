@@ -84,4 +84,5 @@ The plugin is hosted i [Maven Central](https://mvnrepository.com/artifact/com.gi
 
 ## Version history ##
 
+* 2021-06-06: Released 0.0.3 Added configuration parameters to customize sorting. 
 * 2021-06-01: Released 0.0.2 Fully functional but with limited configuration for sorting. Try it out and tell me what you think
