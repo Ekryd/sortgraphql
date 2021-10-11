@@ -1,0 +1,13 @@
+scalar _FieldSet
+directive @extends on OBJECT | INTERFACE
+directive @key(fields: _FieldSet!) repeatable on OBJECT | INTERFACE
+directive @requires(fields: _FieldSet!) on FIELD_DEFINITION
+directive @external on FIELD_DEFINITION
+
+  type Product @key(fields: "upc") @extends {
+    upc: String! @external
+    weight: Int @external
+    price: Int @external
+    inStock: Boolean
+    shippingEstimate: Int @requires(fields: "price weight")
+  }

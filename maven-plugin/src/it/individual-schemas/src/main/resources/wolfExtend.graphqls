@@ -1,0 +1,31 @@
+scalar _FieldSet
+directive @key(fields: _FieldSet!) repeatable on OBJECT | INTERFACE
+directive @extends on OBJECT | INTERFACE
+directive @external on FIELD_DEFINITION
+directive @supernatural(scary: Boolean = true) on FIELD_DEFINITION
+
+type Mutation {
+    cure(moonPhase: MoonRequest): Person @supernatural(scary: false)
+    bite(human: Victim): Werewolf @supernatural(scary: true)
+}
+input Victim {
+    traits: KindType
+}
+
+union Werewolf = Person | Wolf
+
+type Person @key(fields: "name") @extends {
+    name: String @external
+    bittenBy: Werewolf
+}
+
+type Wolf @key(fields: "tag") @extends {
+  tag: String
+}
+
+enum KindType {
+  KIND
+}
+input MoonRequest {
+  full: Boolean
+}

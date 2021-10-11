@@ -15,22 +15,30 @@ public class SorterImpl {
   private SortingLogger log;
   private List<File> schemaFiles;
   private Map<File, String> schemaContents;
-  private GraphQLSchema mergedSchema;
+  private boolean individualSchemas;
 
   public void setup(SortingLogger log, PluginParameters pluginParameters) {
     this.log = log;
     this.schemaFiles = pluginParameters.schemaFiles;
+    this.individualSchemas = pluginParameters.individualSchemas;
 
     sorterService.setup(log, pluginParameters);
   }
 
   public void sortSchemas() {
     schemaContents = sorterService.getSchemaContents(schemaFiles);
-    mergedSchema = sorterService.createMergedSchema(schemaContents.values(), schemaFiles);
-    schemaFiles.forEach(this::sortSchema);
+    if (individualSchemas) {
+      schemaContents.forEach((file, content) -> {
+        var mergedSchema = sorterService.createMergedSchema(List.of(content), List.of(file));
+        sortSchema(file, mergedSchema);
+      });
+    } else {
+      var mergedSchema = sorterService.createMergedSchema(schemaContents.values(), schemaFiles);
+      schemaFiles.forEach(schemaFile -> sortSchema(schemaFile, mergedSchema));
+    }
   }
 
-  private void sortSchema(File schemaFile) {
+  private void sortSchema(File schemaFile, GraphQLSchema mergedSchema) {
     log.info("Sorting file " + schemaFile.getAbsolutePath());
 
     var sortedContent = sorterService.sortSchema(mergedSchema, schemaFile.getName());
