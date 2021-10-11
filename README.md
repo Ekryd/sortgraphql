@@ -73,6 +73,7 @@ in the Maven validate phase. Remember to set the `src/main/resources/` path
 |`<createBackupFile>`| `true` | Should a backup copy be created for the sorted schema. | `<createBackupFile>false</createBackupFile>` |
 |`<backupFileExtension>`| `.bak` | Name of the file extension for the backup file. | `<backupFileExtension>.temp</backupFileExtension>` |
 |`<encoding>`| `UTF-8` | Encoding for the files. | `<encoding>ASCII</encoding>` |
+|`<individualSchemas>`| `false` | By default, if multiple schema files are specified in schema files, then those schemas will be merged together during validation. This flag specifies that each schema should be validated individually. |`-Dsortgraphql.individualSchemas=true` <br><br> `<individualSchemas>true</individualSchemas>` |
 |`<schemaFile>`| `src/main/resources/schema.graphqls` | Location of the schema file. Remember to set the `src/main/resources/` path. |`-Dsortgraphql.schemaFile="src/main/resources/main.graphqls"` <br><br> `<schemaFile>src/main/resources/main.graphqls</schemaFile>` |
 |`<schemaFiles>`| `<empty>` | Location of multiple graphql schema file that should be sorted. Overrides parameter schemaFile. The schema files can reference each other, but shared definitions are not allowed. | <pre lang="xml">&lt;schemaFiles&gt;<br>  &lt;schemaFile&gt;src/main/resources/queries.graphqls&lt;/schemaFile&gt; <br>  &lt;schemaFile&gt;src/main/resources/mutations.graphqls&lt;/schemaFile&gt;<br>&lt;/schemaFiles&gt;</pre> | 
 |`<skip>`| `false` | Set this to 'true' to bypass SortGraphQL plugin. | `-Dsortgraphql.skip=true` <br><br> `<skip>true</skip>` |
@@ -84,5 +85,6 @@ The plugin is hosted i [Maven Central](https://mvnrepository.com/artifact/com.gi
 
 ## Version history ##
 
+* 2021-10-11: Released 0.0.4 Added configuration parameters to validate individual schemas. Input types will also have directives on separate line. 
 * 2021-06-06: Released 0.0.3 Added configuration parameters to customize sorting. 
 * 2021-06-01: Released 0.0.2 Fully functional but with limited configuration for sorting. Try it out and tell me what you think
