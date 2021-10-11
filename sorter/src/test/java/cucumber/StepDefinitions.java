@@ -50,6 +50,12 @@ public class StepDefinitions {
     paramBuilder.setIndividualSchemas(flag);
   }
 
+  @Given("generate schema definition is {booleanValue}")
+  public void generateSchemaDefinition(boolean flag) {
+    var pluginParameters = paramBuilder.build();
+    paramBuilder.setGenerationOptions(flag, pluginParameters.generateAllDirectiveDefinitions, pluginParameters.descriptionsAsHashComments);
+  }
+
   @Given("schema content")
   public void schemaContent(String content) {
     storeSchemaFile("filename", content);

@@ -1,5 +1,124 @@
 Feature: Sorting GraphQL Schemas
 
+  Scenario: basic schema definition
+    Given generate schema definition is true
+    Given schema content
+"""
+schema
+@graph(name: "accounts", url: "https://accounts.api.com")
+@graph(name: "inventory", url: "https://inventory.api.com")
+@graph(name: "product", url: "https://product.api.com")
+@graph(name: "reviews", url: "https://reviews.api.com")
+@graph(name: "advertisement", url: "https://advertisement.api.com")
+@composedGraph(version: 1)
+{
+    query: Query
+}
+
+directive @graph(name: String!, url: String!) repeatable on SCHEMA
+directive @composedGraph(version: Int!) on SCHEMA
+"""
+    When sorting
+    Then schema content will be
+"""
+schema
+@composedGraph(version: 1)
+@graph(name: "accounts", url: "https://accounts.api.com")
+@graph(name: "inventory", url: "https://inventory.api.com")
+@graph(name: "product", url: "https://product.api.com")
+@graph(name: "reviews", url: "https://reviews.api.com")
+@graph(name: "advertisement", url: "https://advertisement.api.com")
+{
+  query: Query
+}
+
+directive @composedGraph(version: Int!) on SCHEMA
+directive @graph(name: String!, url: String!) repeatable on SCHEMA
+
+"""
+
+  Scenario: basic input definition
+    Given schema content
+"""
+directive @meh repeatable on INPUT_OBJECT
+directive @bah(version: Int!) on INPUT_OBJECT
+
+input A {
+  a: Int
+ }
+input B @meh {
+  a: Int
+ }
+input C @meh @bah(version: 1) {
+  a: Int
+ }
+"""
+    When sorting
+    Then schema content will be
+"""
+directive @bah(version: Int!) on INPUT_OBJECT
+directive @meh repeatable on INPUT_OBJECT
+
+input A {
+  a: Int
+}
+
+input B
+@meh
+{
+  a: Int
+}
+
+input C
+@bah(version: 1)
+@meh
+{
+  a: Int
+}
+
+"""
+
+  Scenario: basic interface definition
+    Given schema content
+"""
+directive @meh repeatable on INTERFACE
+directive @bah(version: Int!) on INTERFACE
+
+interface A {
+  a: Int
+ }
+interface B @meh {
+  a: Int
+ }
+interface C @meh @bah(version: 1) {
+  a: Int
+ }
+"""
+    When sorting
+    Then schema content will be
+"""
+directive @bah(version: Int!) on INTERFACE
+directive @meh repeatable on INTERFACE
+
+interface A {
+  a: Int
+}
+
+interface B
+@meh
+{
+  a: Int
+}
+
+interface C
+@bah(version: 1)
+@meh
+{
+  a: Int
+}
+
+"""
+
   Scenario: basic query schema
     Given schema content
 """
@@ -16,7 +135,7 @@ schema
 
 directive @composedGraph(version: Int!) on SCHEMA
 directive @graph(name: String!, url: String!) repeatable on SCHEMA
-directive @owner(graph: String!) on OBJECT
+directive @owner(graph: String!) on OBJECT | INPUT_OBJECT
 directive @key(fields: String!, graph: String!) repeatable on OBJECT
 directive @resolve(graph: String!) on FIELD_DEFINITION
 directive @provides(fields: String!) on FIELD_DEFINITION
@@ -34,6 +153,7 @@ type Query {
 }
 
 input UserFilter
+@owner(graph: "advertisement")
 {
     nrResults: Int = 5
     nameMatches: UserNameMatcher
@@ -141,7 +261,7 @@ union Thing = Car | Product
 directive @composedGraph(version: Int!) on SCHEMA
 directive @graph(name: String!, url: String!) repeatable on SCHEMA
 directive @key(fields: String!, graph: String!) repeatable on OBJECT
-directive @owner(graph: String!) on OBJECT
+directive @owner(graph: String!) on OBJECT | INPUT_OBJECT
 directive @provides(fields: String!) on FIELD_DEFINITION
 directive @requires(fields: String!) on FIELD_DEFINITION
 directive @resolve(graph: String!) on FIELD_DEFINITION
@@ -163,7 +283,9 @@ interface Vehicle {
 
 union Thing = Car | Product
 
-input UserFilter {
+input UserFilter
+@owner(graph: "advertisement")
+{
   nameMatches: UserNameMatcher
   nrResults: Int = 5
 }

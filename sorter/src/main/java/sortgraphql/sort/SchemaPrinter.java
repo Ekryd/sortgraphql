@@ -145,7 +145,7 @@ public class SchemaPrinter {
               "schema%s{",
               schemaDirectives.isEmpty()
                   ? " "
-                  : "\n" + directivesString(GraphQLSchemaElement.class, schemaDirectives))
+                  : directivesString(GraphQLSchemaElement.class, schemaDirectives))
           .append("\n");
       if (queryType != null) {
         out.format("  query: %s", queryType.getName()).append("\n");
@@ -287,10 +287,12 @@ public class SchemaPrinter {
 
     out.format(
         "input %s%s",
-        type.getName(), directivesString(GraphQLInputObjectType.class, type.getDirectives()));
+        type.getName(), 
+        type.getDirectives().isEmpty() ? " " :
+        directivesString(GraphQLInputObjectType.class, type.getDirectives()));
     var inputObjectFields = visibility.getFieldDefinitions(type);
     if (!inputObjectFields.isEmpty()) {
-      out.append(" {\n");
+      out.append("{\n");
       inputObjectFields.stream()
           .filter(options.getIncludeSchemaElement())
           .sorted(comparator)
@@ -548,7 +550,7 @@ public class SchemaPrinter {
       return "";
     }
     var sb = new StringBuilder();
-    if (parent == GraphQLObjectType.class || parent == GraphQLInterfaceType.class) {
+    if (hasDirectiveOnOwnLine(parent)) {
       sb.append("\n");
     } else if (parent != GraphQLSchemaElement.class) {
       sb.append(" ");
@@ -565,13 +567,18 @@ public class SchemaPrinter {
     for (var i = 0; i < directives.size(); i++) {
       var directive = directives.get(i);
       sb.append(directiveString(directive));
-      if (parent == GraphQLObjectType.class || parent == GraphQLSchemaElement.class) {
+      if (hasDirectiveOnOwnLine(parent)) {
         sb.append("\n");
       } else if (i < directives.size() - 1) {
         sb.append(" ");
       }
     }
     return sb.toString();
+  }
+
+  private boolean hasDirectiveOnOwnLine(Class<? extends GraphQLSchemaElement> parent) {
+    return parent == GraphQLObjectType.class || parent == GraphQLInterfaceType.class || parent == GraphQLSchemaElement.class
+         || parent == GraphQLInputObjectType.class;
   }
 
   private String directiveString(GraphQLDirective directive) {
