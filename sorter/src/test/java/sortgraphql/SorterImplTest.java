@@ -144,4 +144,18 @@ class SorterImplTest {
 
     assertThat(util.getTestSchemaContent(), is(expectedSchemaContent));
   }
+  
+    @Test
+  void descriptionsInSchemaShouldBePreserved() throws IOException {
+    var util = new TestSchemaUtil("cucumber/descriptions.graphqls", ".test_bak");
+
+    util.getPluginParameterBuilder().setGenerationOptions(false, false, false);
+    util.sortSchemas();
+
+    var expectedSchemaContent =
+        util.getExpectedSchemaContent("cucumber/descriptions_expected.graphqls");
+
+    assertThat(util.getTestSchemaContent(), is(expectedSchemaContent));
+  }
+
 }

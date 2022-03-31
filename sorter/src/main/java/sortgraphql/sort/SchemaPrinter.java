@@ -11,7 +11,6 @@ import graphql.schema.visibility.GraphqlFieldVisibility;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
@@ -23,6 +22,7 @@ import static graphql.introspection.Introspection.DirectiveLocation.*;
 import static graphql.util.EscapeUtil.escapeJsonString;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.*;
+import static sortgraphql.sort.DescriptionOrComment.*;
 
 /** This can print an in memory GraphQL schema back to a logical schema definition */
 @PublicApi
@@ -287,9 +287,10 @@ public class SchemaPrinter {
 
     out.format(
         "input %s%s",
-        type.getName(), 
-        type.getDirectives().isEmpty() ? " " :
-        directivesString(GraphQLInputObjectType.class, type.getDirectives()));
+        type.getName(),
+        type.getDirectives().isEmpty()
+            ? " "
+            : directivesString(GraphQLInputObjectType.class, type.getDirectives()));
     var inputObjectFields = visibility.getFieldDefinitions(type);
     if (!inputObjectFields.isEmpty()) {
       out.append("{\n");
@@ -408,7 +409,8 @@ public class SchemaPrinter {
       return testType -> false;
     }
     var name = namedType.getName();
-    return testType -> testType.getName().equals(name) && options.getIncludeSchemaElement().test(testType);
+    return testType ->
+        testType.getName().equals(name) && options.getIncludeSchemaElement().test(testType);
   }
 
   private <T> List<T> removeMatchingItems(
@@ -577,8 +579,10 @@ public class SchemaPrinter {
   }
 
   private boolean hasDirectiveOnOwnLine(Class<? extends GraphQLSchemaElement> parent) {
-    return parent == GraphQLObjectType.class || parent == GraphQLInterfaceType.class || parent == GraphQLSchemaElement.class
-         || parent == GraphQLInputObjectType.class;
+    return parent == GraphQLObjectType.class
+        || parent == GraphQLInterfaceType.class
+        || parent == GraphQLSchemaElement.class
+        || parent == GraphQLInputObjectType.class;
   }
 
   private String directiveString(GraphQLDirective directive) {
@@ -719,13 +723,13 @@ public class SchemaPrinter {
 
   private void printComments(PrintWriter out, Object graphQLType, String prefix) {
 
-    var descriptionText = getDescription(graphQLType);
-    if (isNullOrEmpty(descriptionText)) {
+    var description = getDescription(graphQLType);
+    if (description.isNullOrEmpty()) {
       return;
     }
 
-    if (!isNullOrEmpty(descriptionText)) {
-      var lines = Arrays.asList(descriptionText.split("\n"));
+    if (description.isDescription()) {
+      var lines = lines(description::getDescription);
       if (options.isDescriptionsAsHashComments()) {
         printMultiLineHashDescription(out, prefix, lines);
       } else if (!lines.isEmpty()) {
@@ -735,6 +739,8 @@ public class SchemaPrinter {
           printSingleLineDescription(out, prefix, lines.get(0));
         }
       }
+    } else {
+      printMultiLineHashDescription(out, prefix, lines(description::getComment));
     }
   }
 
@@ -756,10 +762,10 @@ public class SchemaPrinter {
 
   private boolean hasDescription(Object descriptionHolder) {
     var description = getDescription(descriptionHolder);
-    return !isNullOrEmpty(description);
+    return !description.isNullOrEmpty();
   }
 
-  private String getDescription(Object descriptionHolder) {
+  private DescriptionOrComment getDescription(Object descriptionHolder) {
     if (descriptionHolder instanceof GraphQLObjectType) {
       var type = (GraphQLObjectType) descriptionHolder;
       return description(
@@ -816,13 +822,13 @@ public class SchemaPrinter {
           ofNullable(type.getDefinition()).map(InputValueDefinition::getDescription).orElse(null));
     } else if (descriptionHolder instanceof GraphQLDirective) {
       var type = (GraphQLDirective) descriptionHolder;
-      return description(type.getDescription(), null);
+      return description(type.getDescription(), ofNullable(type.getDefinition()).map(AbstractDescribedNode::getDescription).orElse(null));
     } else {
       return Assert.assertShouldNeverHappen();
     }
   }
 
-  String description(String runtimeDescription, Description descriptionAst) {
+  DescriptionOrComment description(String runtimeDescription, Description descriptionAst) {
     //
     // 95% of the time if the schema was built from SchemaGenerator then the runtime description is
     // the only description
@@ -832,7 +838,10 @@ public class SchemaPrinter {
     if (isNullOrEmpty(descriptionText) && descriptionAst != null) {
       descriptionText = descriptionAst.getContent();
     }
-    return descriptionText;
+    if (descriptionAst == null) {
+      return DescriptionOrComment.comment(descriptionText);
+    }
+    return DescriptionOrComment.description(descriptionText);
   }
 
   private static boolean isNullOrEmpty(String s) {

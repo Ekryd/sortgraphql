@@ -8,13 +8,15 @@ directive @resolve(graph: String!) on FIELD_DEFINITION
 directive @stream on FIELD
 directive @transform(from: String!) on FIELD
 
-#This is a 
-#long comment
+"""
+This is a 
+long comment
+"""
 type Query {
   me: User @resolve(graph: "accounts")
   myVehicle: Vehicle @resolve(graph: "product")
   topAds(first: Int = 5): [Advertisement] @resolve(graph: "advertisement")
-  #Shorter comment
+  "Shorter comment"
   topProducts(first: Int = 5): [Product] @resolve(graph: "product")
   users(filter: UserFilter): [User] @resolve(graph: "accounts")
 }

@@ -15,17 +15,17 @@ type Query {
 
 union Something = A | B | C
 
-"""
-This is an old 
-long comment
-"""
+#This is an old 
+#long comment
 type A {
-  "Old shorter comment"
+  #Old shorter comment
   thing: String
 }
+
 type B {
   thing: String
 }
+
 type C {
   thing: String
 }

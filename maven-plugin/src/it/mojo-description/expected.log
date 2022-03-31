@@ -53,9 +53,9 @@ sortgraphql:sort
       User property: sortgraphql.encoding
       Encoding for the files.
 
-    generateHashDescriptions (Default: true)
+    generateHashDescriptions (Default: false)
       User property: sortgraphql.generateHashDescriptions
-      Use hash sign for descriptions/comments, instead of string literals (with
+      Use hash sign for descriptions, instead of keeping string literals (with
       quote character), when generating the sorted schema file.
 
     generateSchemaDefinition (Default: false)

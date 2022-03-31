@@ -1,18 +1,16 @@
 directive @supernatural(scary: Boolean = true) on FIELD_DEFINITION
 
 type Query {
-  """
-   Number of days
-   before a person turns to werewolf
-  """
+  # Number of days
+  # before a person turns to werewolf
   daysToTurn: Int
   "Make werewolf"
   fullmoon(moonPhase: MoonRequest): Werewolf @supernatural
-  " Return person"
+  # Return person
   me: Person
 }
 
-" The sound file of a howl"
+# The sound file of a howl
 scalar Howl
 
 interface Animal {

@@ -377,3 +377,99 @@ type Van implements Vehicle
 }
 
 """
+  Scenario: preserving descriptions and comments
+    Given descriptions as hash comments is false
+    Given schema content
+"""
+# Both comment
+"Both description"
+type Query {
+  thing: String
+}
+
+# Type comment
+type WithComments {
+  # Field comment
+  this: String
+}
+
+\"\"\"
+Type description
+Multi-line
+\"\"\"
+type WithDescriptions {
+  "Field description"
+  this: String
+}
+"""
+    When sorting
+    Then schema content will be
+"""
+"Both description"
+type Query {
+  thing: String
+}
+
+# Type comment
+type WithComments {
+  # Field comment
+  this: String
+}
+
+\"\"\"
+Type description
+Multi-line
+\"\"\"
+type WithDescriptions {
+  "Field description"
+  this: String
+}
+
+"""
+  Scenario: convert descriptions to comments
+    Given descriptions as hash comments is true
+    Given schema content
+"""
+# Both comment
+"Both description"
+type Query {
+  thing: String
+}
+
+# Type comment
+type WithComments {
+  # Field comment
+  this: String
+}
+
+\"\"\"
+Type description
+Multi-line
+\"\"\"
+type WithDescriptions {
+  "Field description"
+  this: String
+}
+"""
+    When sorting
+    Then schema content will be
+"""
+#Both description
+type Query {
+  thing: String
+}
+
+# Type comment
+type WithComments {
+  # Field comment
+  this: String
+}
+
+#Type description
+#Multi-line
+type WithDescriptions {
+  #Field description
+  this: String
+}
+
+"""

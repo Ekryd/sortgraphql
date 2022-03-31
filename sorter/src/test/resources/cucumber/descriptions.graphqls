@@ -1,0 +1,95 @@
+"a scalar"
+scalar _Any
+"used to represent a set of fields (minus the braces around them)."
+scalar _FieldSet
+
+"scary stuff"
+directive @supernatural("directive desc" scary: Boolean = true) on FIELD_DEFINITION
+
+"a directive"
+directive @key(fields: _FieldSet!) repeatable on OBJECT | INTERFACE
+
+"""
+Multi-line
+on type
+"""
+type Query {
+    "A field"
+    me :Me
+}
+
+"A type"
+type Me @key(fields: "id"){
+"""
+Multi-line
+on field
+"""
+    id: ID
+    name: String
+}
+
+"The sound file of a howl"
+scalar Howl
+
+"Contains traits of both"
+union Werewolf = Person | Wolf
+
+interface Animal {
+    doesHowl: Boolean
+}
+
+type Wolf {
+    doesHowl: Boolean
+    howl: Howl
+}
+
+type Person {
+   traits: KindType 
+}
+
+"Mutation"
+type Mutation {
+    bite(victim: Victim): Werewolf @supernatural(scary: true)
+}
+
+"input"
+input Victim {
+    "input field"
+    traits: KindType
+}
+
+"another type"
+type Cat implements CuteAnimal & Animal {
+    doesHowl: Boolean
+    howl: Howl
+   traits: KindType 
+}
+
+"interface"
+interface CuteAnimal implements Animal {
+    "interface field"
+    doesHowl: Boolean
+}
+
+"enum"
+enum wereTypes {
+    """
+    enum value
+    multi-line
+    """
+    WORM @deprecated 
+    WOLF
+    BEAR
+}
+
+"""
+Random 
+subscription
+"""
+type Subscription {
+  monthlyWerewolf: Werewolf  
+}
+
+enum KindType {
+    KIND
+}

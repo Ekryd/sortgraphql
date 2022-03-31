@@ -56,6 +56,12 @@ public class StepDefinitions {
     paramBuilder.setGenerationOptions(flag, pluginParameters.generateAllDirectiveDefinitions, pluginParameters.descriptionsAsHashComments);
   }
 
+  @Given("descriptions as hash comments is {booleanValue}")
+  public void descriptionsAsHashComments(boolean flag) {
+    var pluginParameters = paramBuilder.build();
+    paramBuilder.setGenerationOptions(pluginParameters.generateSchemaDefinition, pluginParameters.generateAllDirectiveDefinitions, flag);
+  }
+
   @Given("schema content")
   public void schemaContent(String content) {
     storeSchemaFile("filename", content);

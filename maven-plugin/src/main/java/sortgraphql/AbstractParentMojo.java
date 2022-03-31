@@ -26,10 +26,10 @@ abstract class AbstractParentMojo extends AbstractMojo {
   protected String encoding;
 
   /**
-   * Use hash sign for descriptions/comments, instead of string literals (with quote character),
+   * Use hash sign for descriptions, instead of keeping string literals (with quote character),
    * when generating the sorted schema file.
    */
-  @Parameter(property = "sortgraphql.generateHashDescriptions", defaultValue = "true")
+  @Parameter(property = "sortgraphql.generateHashDescriptions", defaultValue = "false")
   protected boolean generateHashDescriptions;
 
   /**
