@@ -79,12 +79,15 @@ in the Maven validate phase. Remember to set the `src/main/resources/` path
 |`<skip>`| `false` | Set this to 'true' to bypass SortGraphQL plugin. | `-Dsortgraphql.skip=true` <br><br> `<skip>true</skip>` |
 |`<skipFieldArgumentSorting>`| `false` | Set this to 'true' to skip sorting the arguments for a field in a type. | `<skipFieldArgumentSorting>true</skipFieldArgumentSorting>` |
 |`<skipUnionTypeSorting>`| `false` | Set this to 'true' to skip sorting the types in a union. | `<skipUnionTypeSorting>true</skipUnionTypeSorting>` |
+|`<generateHashDescriptions>`| `false` | Use hash sign for descriptions, instead of keeping string literals (with quote character). | `<generateHashDescriptions>true</generateHashDescriptions>` |
+|`<generateSchemaDefinition>`| `false` | Generate the 'schema' definition element at the top of the schema, when generating the sorted schema file. | `<generateSchemaDefinition>true</generateSchemaDefinition>` |
 
 ## Download ##
 The plugin is hosted i [Maven Central](https://mvnrepository.com/artifact/com.github.ekryd.sortgraphql/sortgraphql-maven-plugin) and will be downloaded automatically if you include it as a plugin in your pom file.
 
 ## Version history ##
 
+* 2022-04-02: Released 1.0.0 Supports schema definitions properly. 
 * 2021-10-11: Released 0.0.4 Added configuration parameters to validate individual schemas. Input types will also have directives on separate line. 
 * 2021-06-06: Released 0.0.3 Added configuration parameters to customize sorting. 
 * 2021-06-01: Released 0.0.2 Fully functional but with limited configuration for sorting. Try it out and tell me what you think
