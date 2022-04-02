@@ -121,7 +121,7 @@ public class SorterService {
     return new SchemaPrinter(options.build()).print(graphQLSchema);
   }
 
-  private Predicate<AbstractDescribedNode> sourceLocationPredicate(String schemaFileName) {
+  private Predicate<AbstractDescribedNode<?>> sourceLocationPredicate(String schemaFileName) {
     return node -> {
       if (node == null || node.getSourceLocation() == null) {
         // If we cannot find description or source location, just print the node

@@ -11,7 +11,7 @@ import org.junit.platform.suite.api.Suite;
 @Suite
 @SelectClasspathResource("cucumber")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "cucumber")
-public class RunCucumberTest {
+class RunCucumberTest {
   @Test
   void dummyTestThatStepDefinitionsExist() {
     var actual = new StepDefinitions();
