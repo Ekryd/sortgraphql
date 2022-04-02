@@ -1,15 +1,14 @@
 package sortgraphql;
 
-import org.junit.jupiter.api.Test;
-import sortgraphql.exception.FailureException;
-
-import java.io.IOException;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+
+import java.io.IOException;
+import org.junit.jupiter.api.Test;
+import sortgraphql.exception.FailureException;
 
 class SorterImplTest {
 
@@ -131,7 +130,7 @@ class SorterImplTest {
         endsWith(
             ".graphqls', errors=[The field type 'Product' is not present when resolving type 'Query' [@2:1], 'topProducts' [@3:5] tried to use an undeclared directive 'resolve', 'Advertisement' [@7:1] tried to use an undeclared directive 'owner', 'Advertisement' [@7:1] tried to use an undeclared directive 'key']"));
   }
-  
+
   @Test
   void nonHashCommentsShouldTransformComments() throws IOException {
     var util = new TestSchemaUtil("cucumber/wolfMain.graphqls", ".test_bak");
@@ -144,8 +143,8 @@ class SorterImplTest {
 
     assertThat(util.getTestSchemaContent(), is(expectedSchemaContent));
   }
-  
-    @Test
+
+  @Test
   void descriptionsInSchemaShouldBePreserved() throws IOException {
     var util = new TestSchemaUtil("cucumber/descriptions.graphqls", ".test_bak");
 
@@ -157,5 +156,4 @@ class SorterImplTest {
 
     assertThat(util.getTestSchemaContent(), is(expectedSchemaContent));
   }
-
 }

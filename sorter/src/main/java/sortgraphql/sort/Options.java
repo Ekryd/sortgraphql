@@ -4,7 +4,6 @@ import graphql.language.AbstractDescribedNode;
 import graphql.schema.GraphQLDirective;
 import graphql.schema.GraphQLSchemaElement;
 import graphql.schema.GraphqlTypeComparatorRegistry;
-
 import java.util.function.Predicate;
 
 /** Options to use when printing a schema */
@@ -19,7 +18,7 @@ public class Options {
   private final Predicate<GraphQLDirective> includeDirective;
   private final Predicate<GraphQLSchemaElement> includeSchemaElement;
   private final GraphqlTypeComparatorRegistry comparatorRegistry;
-  private final Predicate<AbstractDescribedNode<?>> nodeDescriptionFilter;
+  private final Predicate<AbstractDescribedNode> nodeDescriptionFilter;
 
   Options(
       boolean includeIntrospectionTypes,
@@ -31,7 +30,7 @@ public class Options {
       Predicate<GraphQLDirective> includeDirective,
       Predicate<GraphQLSchemaElement> includeSchemaElement,
       GraphqlTypeComparatorRegistry comparatorRegistry,
-      Predicate<AbstractDescribedNode<?>> nodeDescriptionFilter) {
+      Predicate<AbstractDescribedNode> nodeDescriptionFilter) {
     this.includeIntrospectionTypes = includeIntrospectionTypes;
     this.includeScalars = includeScalars;
     this.includeSchemaDefinition = includeSchemaDefinition;
@@ -80,7 +79,7 @@ public class Options {
     return comparatorRegistry;
   }
 
-  public Predicate<AbstractDescribedNode<?>> getNodeDescriptionFilter() {
+  public Predicate<AbstractDescribedNode> getNodeDescriptionFilter() {
     return nodeDescriptionFilter;
   }
 }

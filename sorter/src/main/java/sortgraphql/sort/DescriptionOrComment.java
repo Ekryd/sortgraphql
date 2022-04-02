@@ -20,11 +20,11 @@ public class DescriptionOrComment {
   public static DescriptionOrComment description(String description) {
     return new DescriptionOrComment(null, description);
   }
-  
+
   public boolean isNullOrEmpty() {
     return (comment == null || comment.isEmpty()) && (description == null || description.isEmpty());
   }
-  
+
   public boolean isDescription() {
     if (isNullOrEmpty()) {
       throw new IllegalStateException("Both comment and description is null");

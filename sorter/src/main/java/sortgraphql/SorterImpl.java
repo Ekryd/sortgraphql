@@ -1,12 +1,11 @@
 package sortgraphql;
 
 import graphql.schema.GraphQLSchema;
-import sortgraphql.logger.SortingLogger;
-import sortgraphql.parameter.PluginParameters;
-
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import sortgraphql.logger.SortingLogger;
+import sortgraphql.parameter.PluginParameters;
 
 /** The implementation of the Mojo (Maven plugin) that sorts the schema file. */
 public class SorterImpl {
@@ -28,10 +27,11 @@ public class SorterImpl {
   public void sortSchemas() {
     schemaContents = sorterService.getSchemaContents(schemaFiles);
     if (individualSchemas) {
-      schemaContents.forEach((file, content) -> {
-        var mergedSchema = sorterService.createMergedSchema(List.of(content), List.of(file));
-        sortSchema(file, mergedSchema);
-      });
+      schemaContents.forEach(
+          (file, content) -> {
+            var mergedSchema = sorterService.createMergedSchema(List.of(content), List.of(file));
+            sortSchema(file, mergedSchema);
+          });
     } else {
       var mergedSchema = sorterService.createMergedSchema(schemaContents.values(), schemaFiles);
       schemaFiles.forEach(schemaFile -> sortSchema(schemaFile, mergedSchema));

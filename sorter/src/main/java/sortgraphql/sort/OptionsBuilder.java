@@ -2,7 +2,6 @@ package sortgraphql.sort;
 
 import graphql.language.AbstractDescribedNode;
 import graphql.schema.*;
-
 import java.util.Comparator;
 import java.util.function.Predicate;
 
@@ -17,7 +16,7 @@ public class OptionsBuilder {
   private boolean descriptionsAsHashComments;
   private Predicate<GraphQLDirective> includeDirective = directive -> true;
   private Predicate<GraphQLSchemaElement> includeSchemaElement = element -> true;
-  private Predicate<AbstractDescribedNode<?>> nodeDescriptionFilter = node -> true;
+  private Predicate<AbstractDescribedNode> nodeDescriptionFilter = node -> true;
 
   private OptionsBuilder() {}
 
@@ -131,7 +130,7 @@ public class OptionsBuilder {
 
   /** This is a general purpose Predicate that decides whether any type of node is printed ever. */
   public OptionsBuilder setNodeDescriptionFilter(
-      Predicate<AbstractDescribedNode<?>> nodeDescriptionFilter) {
+      Predicate<AbstractDescribedNode> nodeDescriptionFilter) {
     this.nodeDescriptionFilter = nodeDescriptionFilter;
     return this;
   }

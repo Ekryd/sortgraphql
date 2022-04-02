@@ -1,10 +1,16 @@
 package sortgraphql;
 
+import static java.util.stream.Collectors.joining;
+
 import graphql.language.*;
 import graphql.schema.*;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import graphql.schema.idl.errors.SchemaProblem;
+import java.io.File;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import sortgraphql.exception.FailureException;
 import sortgraphql.logger.SortingLogger;
 import sortgraphql.parameter.PluginParameters;
@@ -13,13 +19,6 @@ import sortgraphql.sort.OptionsBuilder;
 import sortgraphql.sort.SchemaParser;
 import sortgraphql.sort.SchemaPrinter;
 import sortgraphql.util.FileUtil;
-
-import java.io.File;
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.joining;
 
 /** Contain the concrete methods to sort the schema */
 public class SorterService {
@@ -83,10 +82,13 @@ public class SorterService {
   private void addArtificialQueryTypeIfMissing(TypeDefinitionRegistry registry) {
     var queryType = registry.getType("Query");
     if (queryType.isEmpty()) {
-      registry.add(ObjectTypeDefinition.newObjectTypeDefinition().name("Query")
-          .sourceLocation(new SourceLocation(0,0, "internal_artificial_type"))
-          .fieldDefinitions(List.of(new FieldDefinition("internal_artificial_field", new TypeName("Int"))))
-          .build());
+      registry.add(
+          ObjectTypeDefinition.newObjectTypeDefinition()
+              .name("Query")
+              .sourceLocation(new SourceLocation(0, 0, "internal_artificial_type"))
+              .fieldDefinitions(
+                  List.of(new FieldDefinition("internal_artificial_field", new TypeName("Int"))))
+              .build());
     }
   }
 
@@ -119,7 +121,7 @@ public class SorterService {
     return new SchemaPrinter(options.build()).print(graphQLSchema);
   }
 
-  private Predicate<AbstractDescribedNode<?>> sourceLocationPredicate(String schemaFileName) {
+  private Predicate<AbstractDescribedNode> sourceLocationPredicate(String schemaFileName) {
     return node -> {
       if (node == null || node.getSourceLocation() == null) {
         // If we cannot find description or source location, just print the node

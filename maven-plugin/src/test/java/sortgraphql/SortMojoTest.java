@@ -1,5 +1,11 @@
 package sortgraphql;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
+
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,12 +15,6 @@ import refutils.ReflectionHelper;
 import sortgraphql.exception.FailureException;
 import sortgraphql.logger.SortingLogger;
 import sortgraphql.parameter.PluginParameters;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
 
 class SortMojoTest {
   private final SorterImpl sorter = mock(SorterImpl.class);

@@ -15,9 +15,7 @@ public class SchemaParser {
       return schemaParser.buildRegistry(document);
     } catch (InvalidSyntaxException e) {
       throw new FailureException(
-          String.format(
-              "Cannot parse schema '%s', %s",
-              sourceName, e.getMessage()));
+          String.format("Cannot parse schema '%s', %s", sourceName, e.getMessage()));
     }
   }
 }

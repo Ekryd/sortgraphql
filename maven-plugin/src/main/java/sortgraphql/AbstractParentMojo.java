@@ -1,11 +1,10 @@
 package sortgraphql;
 
+import java.io.File;
+import java.util.List;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
-
-import java.io.File;
-import java.util.List;
 
 /** Common parent for SortMojo */
 @SuppressWarnings("unused")
@@ -26,8 +25,8 @@ abstract class AbstractParentMojo extends AbstractMojo {
   protected String encoding;
 
   /**
-   * Use hash sign for descriptions, instead of keeping string literals (with quote character),
-   * when generating the sorted schema file.
+   * Use hash sign for descriptions, instead of keeping string literals (with quote character), when
+   * generating the sorted schema file.
    */
   @Parameter(property = "sortgraphql.generateHashDescriptions", defaultValue = "false")
   protected boolean generateHashDescriptions;

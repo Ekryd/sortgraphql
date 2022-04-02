@@ -1,9 +1,9 @@
 package sortgraphql.parameter;
 
+import static java.util.Collections.singletonList;
+
 import java.io.File;
 import java.util.List;
-
-import static java.util.Collections.singletonList;
 
 /** Contains all parameters that are sent to the plugin */
 public class PluginParameters {

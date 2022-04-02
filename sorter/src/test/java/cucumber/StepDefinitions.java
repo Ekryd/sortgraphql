@@ -1,13 +1,14 @@
 package cucumber;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.mock;
+
 import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import sortgraphql.SorterImpl;
-import sortgraphql.logger.SortingLogger;
-import sortgraphql.parameter.PluginParameters;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -16,11 +17,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.mock;
+import sortgraphql.SorterImpl;
+import sortgraphql.logger.SortingLogger;
+import sortgraphql.parameter.PluginParameters;
 
 /** Step definitions for cucumber tests */
 public class StepDefinitions {
@@ -53,13 +52,19 @@ public class StepDefinitions {
   @Given("generate schema definition is {booleanValue}")
   public void generateSchemaDefinition(boolean flag) {
     var pluginParameters = paramBuilder.build();
-    paramBuilder.setGenerationOptions(flag, pluginParameters.generateAllDirectiveDefinitions, pluginParameters.descriptionsAsHashComments);
+    paramBuilder.setGenerationOptions(
+        flag,
+        pluginParameters.generateAllDirectiveDefinitions,
+        pluginParameters.descriptionsAsHashComments);
   }
 
   @Given("descriptions as hash comments is {booleanValue}")
   public void descriptionsAsHashComments(boolean flag) {
     var pluginParameters = paramBuilder.build();
-    paramBuilder.setGenerationOptions(pluginParameters.generateSchemaDefinition, pluginParameters.generateAllDirectiveDefinitions, flag);
+    paramBuilder.setGenerationOptions(
+        pluginParameters.generateSchemaDefinition,
+        pluginParameters.generateAllDirectiveDefinitions,
+        flag);
   }
 
   @Given("schema content")

@@ -1,15 +1,5 @@
 package sortgraphql.util;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
-import refutils.ReflectionHelper;
-import sortgraphql.exception.FailureException;
-import sortgraphql.parameter.PluginParameters;
-
-import java.io.File;
-import java.io.IOException;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -17,6 +7,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+
+import java.io.File;
+import java.io.IOException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
+import refutils.ReflectionHelper;
+import sortgraphql.exception.FailureException;
+import sortgraphql.parameter.PluginParameters;
 
 class FileUtilExceptionsTest {
 
@@ -43,12 +42,16 @@ class FileUtilExceptionsTest {
     assertThat(
         "Unexpected message",
         thrown.getMessage(),
-        is(equalTo("Could not remove old backup file, filename: " + backupFileTemp.getParentFile().getAbsolutePath())));
+        is(
+            equalTo(
+                "Could not remove old backup file, filename: "
+                    + backupFileTemp.getParentFile().getAbsolutePath())));
   }
 
   private void doNotAccessRealBackupFile(FileUtil fileUtil) {
     // Set backup file to a directory (which raises DirectoryNotEmptyException)
-    when(fileUtil.createBackupFileHandle(schemaFileTemp)).thenReturn(backupFileTemp.getParentFile());
+    when(fileUtil.createBackupFileHandle(schemaFileTemp))
+        .thenReturn(backupFileTemp.getParentFile());
   }
 
   @Test
@@ -121,10 +124,8 @@ class FileUtilExceptionsTest {
 
   private FileUtil createFileUtil() {
     FileUtil originalFileUtil = new FileUtil();
-    originalFileUtil.setup(PluginParameters.builder()
-        .setEncoding("UTF-8")
-        .setBackup(true, ".bak")
-        .build());
+    originalFileUtil.setup(
+        PluginParameters.builder().setEncoding("UTF-8").setBackup(true, ".bak").build());
 
     return spy(originalFileUtil);
   }

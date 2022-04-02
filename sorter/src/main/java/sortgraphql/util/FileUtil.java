@@ -1,15 +1,14 @@
 package sortgraphql.util;
 
-import org.apache.commons.io.IOUtils;
-import sortgraphql.exception.FailureException;
-import sortgraphql.parameter.PluginParameters;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
+import org.apache.commons.io.IOUtils;
+import sortgraphql.exception.FailureException;
+import sortgraphql.parameter.PluginParameters;
 
 /** Used to interface with file system */
 public class FileUtil {

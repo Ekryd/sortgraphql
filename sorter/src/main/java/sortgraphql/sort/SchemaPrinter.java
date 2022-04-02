@@ -1,5 +1,12 @@
 package sortgraphql.sort;
 
+import static graphql.Directives.DeprecatedDirective;
+import static graphql.introspection.Introspection.DirectiveLocation.*;
+import static graphql.util.EscapeUtil.escapeJsonString;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.*;
+import static sortgraphql.sort.DescriptionOrComment.lines;
+
 import graphql.Assert;
 import graphql.PublicApi;
 import graphql.execution.ValuesResolver;
@@ -7,7 +14,6 @@ import graphql.language.*;
 import graphql.schema.*;
 import graphql.schema.idl.ScalarInfo;
 import graphql.schema.visibility.GraphqlFieldVisibility;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -16,13 +22,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import static graphql.Directives.DeprecatedDirective;
-import static graphql.introspection.Introspection.DirectiveLocation.*;
-import static graphql.util.EscapeUtil.escapeJsonString;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.*;
-import static sortgraphql.sort.DescriptionOrComment.*;
 
 /** This can print an in memory GraphQL schema back to a logical schema definition */
 @PublicApi
@@ -115,48 +114,8 @@ public class SchemaPrinter {
   }
 
   private void printSchema(PrintWriter out, GraphQLSchema schema) {
-    var schemaDirectives =
-        schema.getSchemaDirectives().stream()
-            .sorted(Comparator.comparing(GraphQLDirective::getName))
-            .collect(toList());
-
-    var queryType = schema.getQueryType();
-    var mutationType = schema.getMutationType();
-    var subscriptionType = schema.getSubscriptionType();
-
-    // when serializing a GraphQL schema using the type system language, a
-    // schema definition should be omitted if only uses the default root type names.
-    var needsSchemaPrinted = options.isIncludeSchemaDefinition();
-
-    if (!needsSchemaPrinted) {
-      if (queryType != null && !queryType.getName().equals("Query")) {
-        needsSchemaPrinted = true;
-      }
-      if (mutationType != null && !mutationType.getName().equals("Mutation")) {
-        needsSchemaPrinted = true;
-      }
-      if (subscriptionType != null && !subscriptionType.getName().equals("Subscription")) {
-        needsSchemaPrinted = true;
-      }
-    }
-
-    if (needsSchemaPrinted) {
-      out.format(
-              "schema%s{",
-              schemaDirectives.isEmpty()
-                  ? " "
-                  : directivesString(GraphQLSchemaElement.class, schemaDirectives))
-          .append("\n");
-      if (queryType != null) {
-        out.format("  query: %s", queryType.getName()).append("\n");
-      }
-      if (mutationType != null) {
-        out.format("  mutation: %s", mutationType.getName()).append("\n");
-      }
-      if (subscriptionType != null) {
-        out.format("  subscription: %s", subscriptionType.getName()).append("\n");
-      }
-      out.append("}\n\n");
+    if (needsSchemaPrinted(schema)) {
+      printSchemaElement(out, schema);
     }
 
     if (options.isIncludeDirectiveDefinitions()) {
@@ -176,6 +135,60 @@ public class SchemaPrinter {
         out.append(directiveDefinitions(directives));
       }
     }
+  }
+
+  private boolean needsSchemaPrinted(GraphQLSchema schema) {
+    var queryType = schema.getQueryType();
+    var mutationType = schema.getMutationType();
+    var subscriptionType = schema.getSubscriptionType();
+
+    // when serializing a GraphQL schema using the type system language, a
+    // schema definition should be omitted if only uses the default root type names.
+    var needsSchemaPrinted = options.isIncludeSchemaDefinition();
+
+    if (!needsSchemaPrinted) {
+      if (queryType != null && !queryType.getName().equals("Query")) {
+        needsSchemaPrinted = true;
+      }
+      if (mutationType != null && !mutationType.getName().equals("Mutation")) {
+        needsSchemaPrinted = true;
+      }
+      if (subscriptionType != null && !subscriptionType.getName().equals("Subscription")) {
+        needsSchemaPrinted = true;
+      }
+    }
+    return needsSchemaPrinted;
+  }
+
+  private void printSchemaElement(PrintWriter out, GraphQLSchema schema) {
+    var schemaDirectives =
+        schema.getSchemaDirectives().stream()
+            .sorted(Comparator.comparing(GraphQLDirective::getName))
+            .collect(toList());
+
+    out.format(
+            "schema%s{",
+            schemaDirectives.isEmpty()
+                ? " "
+                : directivesString(GraphQLSchemaElement.class, schemaDirectives))
+        .append("\n");
+
+    var queryType = schema.getQueryType();
+    if (queryType != null) {
+      out.format("  query: %s", queryType.getName()).append("\n");
+    }
+
+    var mutationType = schema.getMutationType();
+    if (mutationType != null) {
+      out.format("  mutation: %s", mutationType.getName()).append("\n");
+    }
+
+    var subscriptionType = schema.getSubscriptionType();
+    if (subscriptionType != null) {
+      out.format("  subscription: %s", subscriptionType.getName()).append("\n");
+    }
+
+    out.append("}\n\n");
   }
 
   private void printScalar(PrintWriter out, GraphQLScalarType type) {
@@ -597,26 +610,14 @@ public class SchemaPrinter {
     var sb = new StringBuilder();
     sb.append("@").append(directive.getName());
 
-    var environment =
-        GraphqlTypeComparatorEnvironment.newEnvironment()
-            .parentType(GraphQLDirective.class)
-            .elementType(GraphQLArgument.class)
-            .build();
-    var comparator = options.getComparatorRegistry().getComparator(environment);
-
-    var args = directive.getArguments();
-    args =
-        args.stream()
-            .filter(arg -> arg.hasSetValue() && !sameAsDefaultValue(arg))
-            .sorted(comparator)
-            .collect(toList());
+    List<GraphQLArgument> args = getSortedDirectiveArgument(directive);
     if (!args.isEmpty()) {
       sb.append("(");
       for (var i = 0; i < args.size(); i++) {
         var arg = args.get(i);
         String argValue = null;
         if (arg.hasSetValue()) {
-          argValue = printAst(arg.getArgumentValue(), arg.getType());
+          argValue = printAst(arg.toAppliedArgument().getArgumentValue(), arg.getType());
         } else if (arg.hasSetDefaultValue()) {
           argValue = printAst(arg.getArgumentDefaultValue(), arg.getType());
         }
@@ -634,9 +635,26 @@ public class SchemaPrinter {
     return sb.toString();
   }
 
+  private List<GraphQLArgument> getSortedDirectiveArgument(GraphQLDirective directive) {
+    var environment =
+        GraphqlTypeComparatorEnvironment.newEnvironment()
+            .parentType(GraphQLDirective.class)
+            .elementType(GraphQLArgument.class)
+            .build();
+    var comparator = options.getComparatorRegistry().getComparator(environment);
+
+    var args = directive.getArguments();
+    args =
+        args.stream()
+            .filter(arg -> arg.hasSetValue() && !sameAsDefaultValue(arg))
+            .sorted(comparator)
+            .collect(toList());
+    return args;
+  }
+
   private boolean sameAsDefaultValue(GraphQLArgument arg) {
     if (arg.hasSetValue() && arg.hasSetDefaultValue()) {
-      var argValue = arg.getArgumentValue().getValue();
+      var argValue = arg.toAppliedArgument().getArgumentValue().getValue();
       var defaultValue = arg.getArgumentDefaultValue().getValue();
       //noinspection ConstantConditions
       return argValue.toString().equals(defaultValue.toString());
@@ -822,7 +840,9 @@ public class SchemaPrinter {
           ofNullable(type.getDefinition()).map(InputValueDefinition::getDescription).orElse(null));
     } else if (descriptionHolder instanceof GraphQLDirective) {
       var type = (GraphQLDirective) descriptionHolder;
-      return description(type.getDescription(), ofNullable(type.getDefinition()).map(AbstractDescribedNode::getDescription).orElse(null));
+      return description(
+          type.getDescription(),
+          ofNullable(type.getDefinition()).map(AbstractDescribedNode::getDescription).orElse(null));
     } else {
       return Assert.assertShouldNeverHappen();
     }

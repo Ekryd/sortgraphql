@@ -1,16 +1,15 @@
 package sortgraphql;
 
-import org.apache.commons.io.FileUtils;
-import sortgraphql.logger.SortingLogger;
-import sortgraphql.parameter.PluginParameters;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.mock;
+import org.apache.commons.io.FileUtils;
+import sortgraphql.logger.SortingLogger;
+import sortgraphql.parameter.PluginParameters;
 
 /** Utility class for testing to file system */
 public class TestSchemaUtil {

@@ -8,7 +8,6 @@ import graphql.schema.idl.EchoingWiringFactory;
 import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.ScalarInfo;
 import graphql.schema.idl.TypeDefinitionRegistry;
-
 import java.util.stream.Collectors;
 
 /** */
