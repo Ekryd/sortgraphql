@@ -15,7 +15,7 @@ directive @owner(graph: String!) on OBJECT
 directive @provides(fields: String!) on FIELD_DEFINITION
 directive @requires(fields: String!) on FIELD_DEFINITION
 directive @resolve(graph: String!) on FIELD_DEFINITION
-#Directs the executor to skip this field or fragment when the `if`'argument is true.
+#Directs the executor to skip this field or fragment when the `if` argument is true.
 directive @skip(
     #Skipped when true.
     if: Boolean!
