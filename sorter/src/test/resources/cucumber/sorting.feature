@@ -405,6 +405,7 @@ type WithDescriptions {
     When sorting
     Then schema content will be
 """
+# Both comment
 "Both description"
 type Query {
   thing: String
@@ -416,6 +417,68 @@ type WithComments {
   this: String
 }
 
+\"\"\"
+Type description
+Multi-line
+\"\"\"
+type WithDescriptions {
+  "Field description"
+  this: String
+}
+
+"""
+  Scenario: preserving advanced descriptions and comments
+    Given descriptions as hash comments is false
+    Given schema content
+"""
+# Both comment 1
+# Both comment 2
+"Both description"
+type Query {
+  thing: String
+}
+
+# Type comment 1
+# Type comment 2
+# Type comment 3
+"Description first"
+type WithComments {
+  # Field comment
+  this: String
+}
+
+# Both comment 1
+# Both comment 2
+\"\"\"
+Type description
+Multi-line
+\"\"\"
+type WithDescriptions {
+  "Field description"
+  this: String
+}
+"""
+    When sorting
+    Then schema content will be
+"""
+# Both comment 1
+# Both comment 2
+"Both description"
+type Query {
+  thing: String
+}
+
+# Type comment 1
+# Type comment 2
+# Type comment 3
+"Description first"
+type WithComments {
+  # Field comment
+  this: String
+}
+
+# Both comment 1
+# Both comment 2
 \"\"\"
 Type description
 Multi-line
@@ -442,6 +505,8 @@ type WithComments {
   this: String
 }
 
+# Both comment 1
+# Both comment 2
 \"\"\"
 Type description
 Multi-line
@@ -454,6 +519,7 @@ type WithDescriptions {
     When sorting
     Then schema content will be
 """
+# Both comment
 #Both description
 type Query {
   thing: String
@@ -465,6 +531,8 @@ type WithComments {
   this: String
 }
 
+# Both comment 1
+# Both comment 2
 #Type description
 #Multi-line
 type WithDescriptions {
