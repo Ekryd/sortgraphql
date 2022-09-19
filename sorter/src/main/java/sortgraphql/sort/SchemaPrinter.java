@@ -1,17 +1,42 @@
 package sortgraphql.sort;
 
 import static graphql.Directives.DeprecatedDirective;
-import static graphql.introspection.Introspection.DirectiveLocation.*;
+import static graphql.introspection.Introspection.DirectiveLocation.ARGUMENT_DEFINITION;
+import static graphql.introspection.Introspection.DirectiveLocation.ENUM_VALUE;
+import static graphql.introspection.Introspection.DirectiveLocation.FIELD_DEFINITION;
+import static graphql.introspection.Introspection.DirectiveLocation.INPUT_FIELD_DEFINITION;
 import static graphql.util.EscapeUtil.escapeJsonString;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.*;
-import static sortgraphql.sort.DescriptionOrComment.lines;
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toList;
 
-import graphql.Assert;
 import graphql.PublicApi;
 import graphql.execution.ValuesResolver;
-import graphql.language.*;
-import graphql.schema.*;
+import graphql.language.AbstractDescribedNode;
+import graphql.language.AstPrinter;
+import graphql.language.Description;
+import graphql.schema.GraphQLArgument;
+import graphql.schema.GraphQLDirective;
+import graphql.schema.GraphQLEnumType;
+import graphql.schema.GraphQLEnumValueDefinition;
+import graphql.schema.GraphQLFieldDefinition;
+import graphql.schema.GraphQLInputObjectField;
+import graphql.schema.GraphQLInputObjectType;
+import graphql.schema.GraphQLInputType;
+import graphql.schema.GraphQLInterfaceType;
+import graphql.schema.GraphQLNamedSchemaElement;
+import graphql.schema.GraphQLNamedType;
+import graphql.schema.GraphQLObjectType;
+import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLScalarType;
+import graphql.schema.GraphQLSchema;
+import graphql.schema.GraphQLSchemaElement;
+import graphql.schema.GraphQLType;
+import graphql.schema.GraphQLTypeUtil;
+import graphql.schema.GraphQLUnionType;
+import graphql.schema.GraphqlTypeComparatorEnvironment;
+import graphql.schema.InputValueWithState;
 import graphql.schema.idl.ScalarInfo;
 import graphql.schema.visibility.GraphqlFieldVisibility;
 import java.io.PrintWriter;
@@ -19,6 +44,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -732,34 +758,37 @@ public class SchemaPrinter {
     return sb.toString();
   }
 
-  private String printComments(Object graphQLType, String prefix) {
+  private String printComments(GraphQLNamedSchemaElement graphQLType, String prefix) {
     var sw = new StringWriter();
     var pw = new PrintWriter(sw);
     printComments(pw, graphQLType, prefix);
     return sw.toString();
   }
 
-  private void printComments(PrintWriter out, Object graphQLType, String prefix) {
+  private void printComments(
+      PrintWriter out, GraphQLNamedSchemaElement graphQLType, String prefix) {
 
-    var description = getDescription(graphQLType);
-    if (description.isNullOrEmpty()) {
+    var documentation = getDocumentation(graphQLType);
+    if (documentation.isNullOrEmpty()) {
       return;
     }
 
-    if (description.isDescription()) {
-      var lines = lines(description::getDescription);
-      if (options.isDescriptionsAsHashComments()) {
-        printMultiLineHashDescription(out, prefix, lines);
-      } else if (!lines.isEmpty()) {
-        if (lines.size() > 1) {
-          printMultiLineDescription(out, prefix, lines);
-        } else {
-          printSingleLineDescription(out, prefix, lines.get(0));
-        }
-      }
-    } else {
-      printMultiLineHashDescription(out, prefix, lines(description::getComment));
-    }
+    printMultiLineHashDescription(out, prefix, documentation.getComments());
+
+    documentation
+        .getDescription()
+        .map(description -> asList(description.split("\n")))
+        .filter(lines -> !lines.isEmpty())
+        .ifPresent(
+            lines -> {
+              if (options.isDescriptionsAsHashComments()) {
+                printMultiLineHashDescription(out, prefix, lines);
+              } else if (lines.size() > 1) {
+                printMultiLineDescription(out, prefix, lines);
+              } else {
+                printSingleLineDescription(out, prefix, lines.get(0));
+              }
+            });
   }
 
   private void printMultiLineHashDescription(PrintWriter out, String prefix, List<String> lines) {
@@ -778,90 +807,28 @@ public class SchemaPrinter {
     out.printf("%s\"%s\"", prefix, desc).append("\n");
   }
 
-  private boolean hasDescription(Object descriptionHolder) {
-    var description = getDescription(descriptionHolder);
+  private boolean hasDescription(GraphQLNamedSchemaElement descriptionHolder) {
+    var description = getDocumentation(descriptionHolder);
     return !description.isNullOrEmpty();
   }
 
-  private DescriptionOrComment getDescription(Object descriptionHolder) {
-    if (descriptionHolder instanceof GraphQLObjectType) {
-      var type = (GraphQLObjectType) descriptionHolder;
-      return description(
-          type.getDescription(),
-          ofNullable(type.getDefinition()).map(ObjectTypeDefinition::getDescription).orElse(null));
-    } else if (descriptionHolder instanceof GraphQLEnumType) {
-      var type = (GraphQLEnumType) descriptionHolder;
-      return description(
-          type.getDescription(),
-          ofNullable(type.getDefinition()).map(EnumTypeDefinition::getDescription).orElse(null));
-    } else if (descriptionHolder instanceof GraphQLFieldDefinition) {
-      var type = (GraphQLFieldDefinition) descriptionHolder;
-      return description(
-          type.getDescription(),
-          ofNullable(type.getDefinition()).map(FieldDefinition::getDescription).orElse(null));
-    } else if (descriptionHolder instanceof GraphQLEnumValueDefinition) {
-      var type = (GraphQLEnumValueDefinition) descriptionHolder;
-      return description(
-          type.getDescription(),
-          ofNullable(type.getDefinition()).map(EnumValueDefinition::getDescription).orElse(null));
-    } else if (descriptionHolder instanceof GraphQLUnionType) {
-      var type = (GraphQLUnionType) descriptionHolder;
-      return description(
-          type.getDescription(),
-          ofNullable(type.getDefinition()).map(UnionTypeDefinition::getDescription).orElse(null));
-    } else if (descriptionHolder instanceof GraphQLInputObjectType) {
-      var type = (GraphQLInputObjectType) descriptionHolder;
-      return description(
-          type.getDescription(),
-          ofNullable(type.getDefinition())
-              .map(InputObjectTypeDefinition::getDescription)
-              .orElse(null));
-    } else if (descriptionHolder instanceof GraphQLInputObjectField) {
-      var type = (GraphQLInputObjectField) descriptionHolder;
-      return description(
-          type.getDescription(),
-          ofNullable(type.getDefinition()).map(InputValueDefinition::getDescription).orElse(null));
-    } else if (descriptionHolder instanceof GraphQLInterfaceType) {
-      var type = (GraphQLInterfaceType) descriptionHolder;
-      return description(
-          type.getDescription(),
-          ofNullable(type.getDefinition())
-              .map(InterfaceTypeDefinition::getDescription)
-              .orElse(null));
-    } else if (descriptionHolder instanceof GraphQLScalarType) {
-      var type = (GraphQLScalarType) descriptionHolder;
-      return description(
-          type.getDescription(),
-          ofNullable(type.getDefinition()).map(ScalarTypeDefinition::getDescription).orElse(null));
-    } else if (descriptionHolder instanceof GraphQLArgument) {
-      var type = (GraphQLArgument) descriptionHolder;
-      return description(
-          type.getDescription(),
-          ofNullable(type.getDefinition()).map(InputValueDefinition::getDescription).orElse(null));
-    } else if (descriptionHolder instanceof GraphQLDirective) {
-      var type = (GraphQLDirective) descriptionHolder;
-      return description(
-          type.getDescription(),
-          ofNullable(type.getDefinition()).map(AbstractDescribedNode::getDescription).orElse(null));
-    } else {
-      return Assert.assertShouldNeverHappen();
-    }
-  }
+  private DescriptionAndComments getDocumentation(GraphQLNamedSchemaElement type) {
+    var returnValue = new DescriptionAndComments();
 
-  DescriptionOrComment description(String runtimeDescription, Description descriptionAst) {
-    //
-    // 95% of the time if the schema was built from SchemaGenerator then the runtime description is
-    // the only description
-    // So the other code here is a really defensive way to get the description
-    //
-    var descriptionText = runtimeDescription;
-    if (isNullOrEmpty(descriptionText) && descriptionAst != null) {
-      descriptionText = descriptionAst.getContent();
+    AbstractDescribedNode<?> definition = (AbstractDescribedNode<?>) type.getDefinition();
+
+    if (definition != null) {
+      returnValue.comments(definition.getComments());
     }
-    if (descriptionAst == null) {
-      return DescriptionOrComment.comment(descriptionText);
-    }
-    return DescriptionOrComment.description(descriptionText);
+
+    Optional.ofNullable(definition)
+        .map(AbstractDescribedNode::getDescription)
+        .map(Description::getContent)
+        .or(() -> Optional.ofNullable(type.getDescription()))
+        .filter(d -> !d.isBlank())
+        .ifPresent(returnValue::description);
+
+    return returnValue;
   }
 
   private static boolean isNullOrEmpty(String s) {

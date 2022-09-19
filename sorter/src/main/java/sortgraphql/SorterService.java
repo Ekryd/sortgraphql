@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.joining;
 import graphql.language.*;
 import graphql.schema.*;
 import graphql.schema.idl.SchemaGenerator;
+import graphql.schema.idl.SchemaGenerator.Options;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import graphql.schema.idl.errors.SchemaProblem;
 import java.io.File;
@@ -22,6 +23,9 @@ import sortgraphql.util.FileUtil;
 
 /** Contain the concrete methods to sort the schema */
 public class SorterService {
+
+  private static final Options SCHEMA_GENERATOR_OPTIONS =
+      Options.defaultOptions().useCommentsAsDescriptions(false);
   private final FileUtil fileUtil = new FileUtil();
   private final FakeRuntimeWiringFactory wiringFactory = new FakeRuntimeWiringFactory();
 
@@ -69,7 +73,8 @@ public class SorterService {
     var runtimeWiring = wiringFactory.createFakeRuntime(registry);
 
     try {
-      return new SchemaGenerator().makeExecutableSchema(registry, runtimeWiring);
+      return new SchemaGenerator()
+          .makeExecutableSchema(SCHEMA_GENERATOR_OPTIONS, registry, runtimeWiring);
     } catch (SchemaProblem schemaProblem) {
       throw new FailureException(
           String.format(

@@ -1,6 +1,8 @@
 package sortgraphql.sort;
 
-import graphql.language.Comment;
+import static java.util.Optional.ofNullable;
+
+import graphql.language.Description;
 import graphql.language.ScalarTypeDefinition;
 import graphql.schema.Coercing;
 import graphql.schema.GraphQLScalarType;
@@ -8,7 +10,6 @@ import graphql.schema.idl.EchoingWiringFactory;
 import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.ScalarInfo;
 import graphql.schema.idl.TypeDefinitionRegistry;
-import java.util.stream.Collectors;
 
 /** */
 public class FakeRuntimeWiringFactory {
@@ -45,23 +46,17 @@ public class FakeRuntimeWiringFactory {
 
   private void addScalarToWiring(
       RuntimeWiring.Builder wiringBuilder, String scalarName, ScalarTypeDefinition definition) {
+    var scalarDescription =
+        ofNullable(definition)
+            .map(ScalarTypeDefinition::getDescription)
+            .map(Description::getContent)
+            .orElse(null);
+
     wiringBuilder.scalar(
         GraphQLScalarType.newScalar()
             .name(scalarName)
-            .description(getScalarDescription(definition))
+            .description(scalarDescription)
             .coercing(emptyCoercing)
             .build());
-  }
-
-  private String getScalarDescription(ScalarTypeDefinition definition) {
-    if (definition.getDescription() != null && definition.getDescription().getContent() != null) {
-      return definition.getDescription().getContent();
-    }
-    if (!definition.getComments().isEmpty()) {
-      return definition.getComments().stream()
-          .map(Comment::getContent)
-          .collect(Collectors.joining(" "));
-    }
-    return null;
   }
 }
