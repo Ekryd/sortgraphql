@@ -12,5 +12,6 @@
   *                                                                              *
   *  mvn versions:display-dependency-updates                                     *
   *  mvn versions:display-plugin-updates                                         *
+  *  echo "test" | gpg --clearsign    (test gpg: signing failed: No pinentry)    *
   *                                                                              *
   ********************************************************************************
