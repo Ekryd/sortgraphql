@@ -87,6 +87,7 @@ The plugin is hosted i [Maven Central](https://mvnrepository.com/artifact/com.gi
 
 ## Version history ##
 
+* 2022-09-20: Released 1.1.0 Differentiate between descriptions and comments when processing files. 
 * 2022-04-02: Released 1.0.0 Supports schema definitions properly. 
 * 2021-10-11: Released 0.0.4 Added configuration parameters to validate individual schemas. Input types will also have directives on separate line. 
 * 2021-06-06: Released 0.0.3 Added configuration parameters to customize sorting. 
