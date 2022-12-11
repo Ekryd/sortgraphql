@@ -11,6 +11,7 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 
+import graphql.GraphQLContext;
 import graphql.PublicApi;
 import graphql.execution.ValuesResolver;
 import graphql.language.AbstractDescribedNode;
@@ -44,6 +45,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -187,6 +189,8 @@ public class SchemaPrinter {
   }
 
   private void printSchemaElement(PrintWriter out, GraphQLSchema schema) {
+    // Too much work to replace this deprecation
+    //noinspection deprecation
     var schemaDirectives =
         schema.getSchemaDirectives().stream()
             .sorted(Comparator.comparing(GraphQLDirective::getName))
@@ -502,7 +506,9 @@ public class SchemaPrinter {
   }
 
   private static String printAst(InputValueWithState value, GraphQLInputType type) {
-    return AstPrinter.printAst(ValuesResolver.valueToLiteral(value, type));
+    return AstPrinter.printAst(
+        ValuesResolver.valueToLiteral(
+            value, type, GraphQLContext.getDefault(), Locale.getDefault()));
   }
 
   private List<GraphQLDirective> getSchemaDirectives(GraphQLSchema schema) {

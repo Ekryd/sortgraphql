@@ -115,7 +115,7 @@ class SorterImplTest {
     assertThat(
         thrown.getMessage(),
         endsWith(
-            ".graphqls', Invalid Syntax : There are more tokens in the query that have not been consumed offending token 'topProducts' at line 3 column 5"));
+            ".graphqls', Invalid syntax encountered. There are extra tokens in the text that have not been consumed. Offending token 'topProducts' at line 3 column 5"));
   }
 
   @Test
