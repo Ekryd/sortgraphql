@@ -73,7 +73,8 @@ public class TestSchemaUtil {
   }
 
   public String getExpectedSchemaContent(String expectedFilename) throws IOException {
-    return FileUtils.readFileToString(
+    var fileContent = FileUtils.readFileToString(
         new File("src/test/resources/" + expectedFilename), StandardCharsets.UTF_8);
+    return fileContent.replace(System.getProperty("line.separator"), "\n");
   }
 }
