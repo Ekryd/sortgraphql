@@ -57,11 +57,11 @@ public class TestSchemaUtil {
   }
 
   public String getTestSchemaContent() throws IOException {
-    return FileUtils.readFileToString(testSchemaFile, StandardCharsets.UTF_8);
+    return readFileContent(testSchemaFile);
   }
 
   public String getOriginalSchemaContent() throws IOException {
-    return FileUtils.readFileToString(originalSchemaFile, StandardCharsets.UTF_8);
+    return readFileContent(originalSchemaFile);
   }
 
   public File getBackupSchemaFile() {
@@ -69,12 +69,15 @@ public class TestSchemaUtil {
   }
 
   public String getBackupSchemaContent() throws IOException {
-    return FileUtils.readFileToString(backupSchemaFile, StandardCharsets.UTF_8);
+    return readFileContent(backupSchemaFile);
   }
 
   public String getExpectedSchemaContent(String expectedFilename) throws IOException {
-    var fileContent = FileUtils.readFileToString(
-        new File("src/test/resources/" + expectedFilename), StandardCharsets.UTF_8);
+    return readFileContent(new File("src/test/resources/" + expectedFilename));
+  }
+
+  private String readFileContent(File file) throws IOException {
+    var fileContent = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
     return fileContent.replace(System.getProperty("line.separator"), "\n");
   }
 }
