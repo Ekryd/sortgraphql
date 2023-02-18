@@ -115,7 +115,8 @@ public class StepDefinitions {
       throw new RuntimeException("Cannot find file: " + filename);
     }
     try {
-      return new String(schemaStream.readAllBytes());
+      var fileConetent = new String(schemaStream.readAllBytes());
+      return fileConetent.replace(System.getProperty("line.separator"), "\n");
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
