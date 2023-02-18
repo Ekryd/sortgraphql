@@ -3,6 +3,7 @@
 
 # Declare files that will always have LF line endings on checkout.
 *.txt eol=lf
+*.graphqls eol=lf
 
 # Don't modify line ending on xml files.
 *.xml -text
