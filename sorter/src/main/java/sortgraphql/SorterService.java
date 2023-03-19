@@ -111,7 +111,9 @@ public class SorterService {
               .parentType(GraphQLUnionType.class)
               .elementType(GraphQLOutputType.class)
               .build();
-      options.addComparatorToRegistry(environment, (Comparator<GraphQLOutputType>) (o1, o2) -> 0);
+      options =
+          options.addComparatorToRegistry(
+              environment, (Comparator<GraphQLOutputType>) (o1, o2) -> 0);
     }
     if (skipFieldArgumentSorting) {
       var environment =
@@ -119,9 +121,10 @@ public class SorterService {
               .parentType(GraphQLFieldDefinition.class)
               .elementType(GraphQLArgument.class)
               .build();
-      options.addComparatorToRegistry(environment, (Comparator<GraphQLArgument>) (o1, o2) -> 0);
+      options =
+          options.addComparatorToRegistry(environment, (Comparator<GraphQLArgument>) (o1, o2) -> 0);
     }
-    options.setNodeDescriptionFilter(sourceLocationPredicate(schemaFileName));
+    options = options.setNodeDescriptionFilter(sourceLocationPredicate(schemaFileName));
 
     return new SchemaPrinter(options.build()).print(graphQLSchema);
   }

@@ -688,7 +688,7 @@ public class SchemaPrinter {
     if (arg.hasSetValue() && arg.hasSetDefaultValue()) {
       var argValue = arg.toAppliedArgument().getArgumentValue().getValue();
       var defaultValue = arg.getArgumentDefaultValue().getValue();
-      //noinspection ConstantConditions
+      //noinspection DataFlowIssue
       return argValue.toString().equals(defaultValue.toString());
     }
     return false;

@@ -1,7 +1,7 @@
 directive @supernatural(scary: Boolean = true) on FIELD_DEFINITION
 
 type Query {
-  fullmoon(moonPhase: MoonRequest): Werewolf @supernatural
+  fullMoon(moonPhase: MoonRequest): Werewolf @supernatural
   me: Person
 }
 

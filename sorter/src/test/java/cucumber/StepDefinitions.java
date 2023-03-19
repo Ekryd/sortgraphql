@@ -110,11 +110,10 @@ public class StepDefinitions {
   }
 
   private String getContentFromFileName(String filename) {
-    var schemaStream = StepDefinitions.class.getResourceAsStream(filename);
-    if (schemaStream == null) {
-      throw new RuntimeException("Cannot find file: " + filename);
-    }
-    try {
+    try (var schemaStream = StepDefinitions.class.getResourceAsStream(filename)) {
+      if (schemaStream == null) {
+        throw new RuntimeException("Cannot find file: " + filename);
+      }
       return new String(schemaStream.readAllBytes());
     } catch (IOException e) {
       throw new RuntimeException(e);

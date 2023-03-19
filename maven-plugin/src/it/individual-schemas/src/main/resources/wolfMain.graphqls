@@ -4,7 +4,7 @@ directive @key(fields: _FieldSet!) repeatable on OBJECT | INTERFACE
 
 type Query {
     me: Person
-    fullmoon(moonPhase: MoonRequest): Werewolf    @supernatural(scary: true)
+    fullMoon(moonPhase: MoonRequest): Werewolf    @supernatural(scary: true)
 }
 
 input MoonRequest {

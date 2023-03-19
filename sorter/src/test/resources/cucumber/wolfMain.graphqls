@@ -4,7 +4,7 @@ type Query {
     # Return person
     me: Person
     "Make werewolf"
-    fullmoon(moonPhase: MoonRequest): Werewolf    @supernatural(scary: true)
+    fullMoon(moonPhase: MoonRequest): Werewolf    @supernatural(scary: true)
     # Number of days
     # before a person turns to werewolf
     daysToTurn: Int
