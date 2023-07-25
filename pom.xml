@@ -19,7 +19,6 @@
   <properties>
     <cucumber.version>7.13.0</cucumber.version>
     <java.version>11</java.version>
-    <junit.jupiter.version>5.9.3</junit.jupiter.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <mockito.version>5.2.0</mockito.version>
@@ -29,6 +28,13 @@
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>5.10.0</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
       <dependency>
         <groupId>com.graphql-java</groupId>
         <artifactId>graphql-java</artifactId>
@@ -58,7 +64,6 @@
     <dependency>
       <groupId>org.junit.platform</groupId>
       <artifactId>junit-platform-suite-engine</artifactId>
-      <version>1.10.0</version>
     </dependency>
     <dependency>
       <groupId>com.github.ekryd.reflection-utils</groupId>
@@ -86,14 +91,7 @@
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
-      <version>${junit.jupiter.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-params</artifactId>
-      <version>${junit.jupiter.version}</version>
+      <artifactId>junit-jupiter</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
