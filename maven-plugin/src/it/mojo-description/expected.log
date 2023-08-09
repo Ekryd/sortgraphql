@@ -8,7 +8,8 @@ Goal Prefix: sortgraphql
 This plugin has 2 goals:
 
 sortgraphql:help
-  Description: Unknown
+  Description: Display help information on sortgraphql-maven-plugin. Call mvn
+    sortgraphql:help -Ddetail=true -Dgoal= to display parameter details.
   Implementation: sortgraphql.HelpMojo
   Language: java
 
