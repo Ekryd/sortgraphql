@@ -11,6 +11,8 @@ directive @include(
     if: Boolean!
   ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
 directive @key(fields: String!, graph: String!) repeatable on OBJECT
+#Indicates an Input Object is a OneOf Input Object.
+directive @oneOf on INPUT_OBJECT
 directive @owner(graph: String!) on OBJECT
 directive @provides(fields: String!) on FIELD_DEFINITION
 directive @requires(fields: String!) on FIELD_DEFINITION
