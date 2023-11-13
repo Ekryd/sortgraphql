@@ -8,32 +8,36 @@ shared: &shared
     - checkout
     - restore_cache:
         keys:
-          - sortgraphql-cache-{{ checksum "pom.xml" }}
-          - sortgraphql-cache- # fallback in case previous cache key is not found
-    - run: mvn clean verify -Dmaven.javadoc.skip=true -Dinvoker.skip=true -DskipPitest=true -B -V
+          - ekryd-cache-{{ checksum "pom.xml" }}
+          - ekryd-cache- # fallback in case previous cache key is not found
+    - run: mvn clean verify -Dmaven.javadoc.skip=true -Dinvoker.skip=true -B -V
     - save_cache:
         paths:
           - ~/.m2
-        key: sortgraphql-cache--{{ checksum "pom.xml" }}
+        key: ekryd-cache--{{ checksum "pom.xml" }}
 
 jobs:
-  jdk17:
-    docker:
-      - image: cimg/openjdk:17.0
-    <<: *shared
-  jdk18:
-    docker:
-      - image: cimg/openjdk:18.0
-    <<: *shared
   jdk11:
     docker:
       - image: cimg/openjdk:11.0
+    <<: *shared
+  jdk20:
+    docker:
+      - image: cimg/openjdk:20.0
+    <<: *shared
+  jdk21:
+    docker:
+      - image: cimg/openjdk:21.0
+    <<: *shared
+  jdk17:
+    docker:
+      - image: cimg/openjdk:17.0
     steps:
       - checkout
       - restore_cache:
           keys:
-            - sortgraphql-cache-{{ checksum "pom.xml" }}
-            - sortgraphql-cache- # fallback in case previous cache key is not found
+            - ekryd-cache-{{ checksum "pom.xml" }}
+            - ekryd-cache- # fallback in case previous cache key is not found
       - run: mvn clean verify -DskipTests=true -Dmaven.javadoc.skip=true -Dinvoker.skip=true -B -V
       - run: mvn clean jacoco:prepare-agent integration-test jacoco:report -B
       - run: mvn coveralls:report -B -DrepoToken=$COVERALLS_REPO_TOKEN
@@ -41,22 +45,25 @@ jobs:
       - save_cache:
           paths:
             - ~/.m2
-          key: sortgraphql-cache--{{ checksum "pom.xml" }}
+          key: ekryd-cache--{{ checksum "pom.xml" }}
 
 workflows:
   version: 2
   work:
     jobs:
-      - jdk17
-      - jdk18:
+      - jdk21
+      - jdk20:
           requires:
-            - jdk17
+            - jdk21
       - jdk11:
+          requires:
+            - jdk21
+      - jdk17:
           filters: # using regex filters requires the entire branch to match
             branches:
               only: # only branches matching the below regex filters will run
                 - master
           requires:
-            - jdk17
-            - jdk18
-        
+            - jdk11
+            - jdk20
+            - jdk21
