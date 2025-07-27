@@ -17,7 +17,7 @@
   </modules>
 
   <properties>
-    <cucumber.version>7.26.0</cucumber.version>
+    <cucumber.version>7.27.0</cucumber.version>
     <java.version>11</java.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
