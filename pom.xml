@@ -18,7 +18,7 @@
 
   <properties>
     <cucumber.version>7.32.0</cucumber.version>
-    <java.version>11</java.version>
+    <java.version>17</java.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -30,7 +30,7 @@
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
-        <version>5.14.1</version>
+        <version>6.0.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -284,7 +284,7 @@
       <plugin>
         <groupId>com.spotify.fmt</groupId>
         <artifactId>fmt-maven-plugin</artifactId>
-        <version>2.25</version>
+        <version>2.29</version>
         <executions>
           <execution>
             <goals>
