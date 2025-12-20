@@ -157,7 +157,7 @@ public class SchemaPrinter {
                   directive ->
                       directive.getDefinition() != null
                           && directive.getDefinition().getSourceLocation() != null)
-              .collect(Collectors.toList());
+              .toList();
       if (!directives.isEmpty()) {
         out.append(directiveDefinitions(directives));
       }
