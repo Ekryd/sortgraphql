@@ -6,7 +6,6 @@ import graphql.language.Comment;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class DescriptionAndComments {
   private List<String> comments = List.of();
@@ -21,7 +20,7 @@ public class DescriptionAndComments {
             .map(Comment::getContent)
             .filter(Objects::nonNull)
             .filter(c -> !c.isBlank())
-            .collect(Collectors.toList());
+            .toList();
   }
 
   public void description(String description) {

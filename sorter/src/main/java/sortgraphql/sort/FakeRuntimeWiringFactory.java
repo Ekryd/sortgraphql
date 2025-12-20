@@ -10,23 +10,26 @@ import graphql.schema.idl.EchoingWiringFactory;
 import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.ScalarInfo;
 import graphql.schema.idl.TypeDefinitionRegistry;
+import org.jspecify.annotations.NonNull;
 
-/** */
 public class FakeRuntimeWiringFactory {
   static final Coercing<Object, Object> emptyCoercing =
       new Coercing<>() {
+        @SuppressWarnings("deprecation")
         @Override
-        public Object serialize(Object dataFetcherResult) {
+        public Object serialize(@NonNull Object dataFetcherResult) {
           return dataFetcherResult;
         }
 
+        @SuppressWarnings("deprecation")
         @Override
-        public Object parseValue(Object input) {
+        public Object parseValue(@NonNull Object input) {
           return input;
         }
 
+        @SuppressWarnings("deprecation")
         @Override
-        public Object parseLiteral(Object input) {
+        public Object parseLiteral(@NonNull Object input) {
           return input;
         }
       };

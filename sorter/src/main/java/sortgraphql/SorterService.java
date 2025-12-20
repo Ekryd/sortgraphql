@@ -85,8 +85,8 @@ public class SorterService {
   }
 
   private void addArtificialQueryTypeIfMissing(TypeDefinitionRegistry registry) {
-    var queryType = registry.getType("Query");
-    if (queryType.isEmpty()) {
+    var queryType = registry.getTypeOrNull("Query");
+    if (queryType == null) {
       registry.add(
           ObjectTypeDefinition.newObjectTypeDefinition()
               .name("Query")
@@ -147,7 +147,7 @@ public class SorterService {
     if (!createBackupFile) {
       return;
     }
-    if (backupFileExtension.trim().length() == 0) {
+    if (backupFileExtension.trim().isEmpty()) {
       throw new FailureException("Could not create backup file, extension name was empty");
     }
     fileUtil.backupFile(schemaFile);

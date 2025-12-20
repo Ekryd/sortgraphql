@@ -9,7 +9,6 @@ import static graphql.util.EscapeUtil.escapeJsonString;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toCollection;
-import static java.util.stream.Collectors.toList;
 
 import graphql.GraphQLContext;
 import graphql.PublicApi;
@@ -194,7 +193,7 @@ public class SchemaPrinter {
     var schemaDirectives =
         schema.getSchemaDirectives().stream()
             .sorted(Comparator.comparing(GraphQLDirective::getName))
-            .collect(toList());
+            .toList();
 
     out.format(
             "schema%s{",
@@ -301,7 +300,7 @@ public class SchemaPrinter {
     out.format(
         "union %s%s = ",
         type.getName(), directivesString(GraphQLUnionType.class, type.getDirectives()));
-    var types = type.getTypes().stream().sorted(comparator).collect(toList());
+    var types = type.getTypes().stream().sorted(comparator).toList();
     for (var i = 0; i < types.size(); i++) {
       var objectType = types.get(i);
       if (i > 0) {
@@ -422,7 +421,7 @@ public class SchemaPrinter {
     printComments(out, type, "");
     out.format(
         "enum %s%s", type.getName(), directivesString(GraphQLEnumType.class, type.getDirectives()));
-    var values = type.getValues().stream().sorted(comparator).collect(toList());
+    var values = type.getValues().stream().sorted(comparator).toList();
     if (!values.isEmpty()) {
       out.append(" {\n");
       for (var enumValueDefinition : values) {
@@ -517,7 +516,7 @@ public class SchemaPrinter {
         .filter(options.getIncludeSchemaElement())
         .filter(d -> options.getNodeDescriptionFilter().test(d.getDefinition()))
         .sorted(Comparator.comparing(GraphQLDirective::getName))
-        .collect(toList());
+        .toList();
   }
 
   String typeString(GraphQLType rawType) {
@@ -539,10 +538,7 @@ public class SchemaPrinter {
     var comparator = options.getComparatorRegistry().getComparator(environment);
 
     arguments =
-        arguments.stream()
-            .sorted(comparator)
-            .filter(options.getIncludeSchemaElement())
-            .collect(toList());
+        arguments.stream().sorted(comparator).filter(options.getIncludeSchemaElement()).toList();
     for (var argument : arguments) {
       if (count == 0) {
         sb.append("(");
@@ -591,7 +587,7 @@ public class SchemaPrinter {
                     options.getIncludeDirective().test(directive)
                         || isDeprecatedDirective(directive))
             .filter(options.getIncludeSchemaElement())
-            .collect(toList());
+            .toList();
 
     if (directives.isEmpty()) {
       return "";
@@ -610,7 +606,7 @@ public class SchemaPrinter {
             .build();
     var comparator = options.getComparatorRegistry().getComparator(environment);
 
-    directives = directives.stream().sorted(comparator).collect(toList());
+    directives = directives.stream().sorted(comparator).toList();
     for (var i = 0; i < directives.size(); i++) {
       var directive = directives.get(i);
       sb.append(directiveString(directive));
@@ -680,7 +676,7 @@ public class SchemaPrinter {
         args.stream()
             .filter(arg -> arg.hasSetValue() && !sameAsDefaultValue(arg))
             .sorted(comparator)
-            .collect(toList());
+            .toList();
     return args;
   }
 
@@ -743,11 +739,7 @@ public class SchemaPrinter {
     var comparator = options.getComparatorRegistry().getComparator(environment);
 
     var args = directive.getArguments();
-    args =
-        args.stream()
-            .filter(options.getIncludeSchemaElement())
-            .sorted(comparator)
-            .collect(toList());
+    args = args.stream().filter(options.getIncludeSchemaElement()).sorted(comparator).toList();
 
     sb.append(argsString(GraphQLDirective.class, args));
 
